@@ -7,14 +7,19 @@
 //
 
 #import "NemoAppDelegate.h"
+#import "HomePageViewController.h"
+
 
 @implementation NemoAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
+    //self.window.backgroundColor = [UIColor whiteColor];
+    HomePageViewController *hpVc = [[HomePageViewController alloc] init];
+    [[self window] setRootViewController:hpVc];
     [self.window makeKeyAndVisible];
     return YES;
 }
