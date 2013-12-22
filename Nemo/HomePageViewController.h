@@ -18,7 +18,6 @@
 
 @property (weak, nonatomic) IBOutlet UIImageView *logo;
 
-@property BOOL status;
 
 - (IBAction)doLogin:(id)sender;
 

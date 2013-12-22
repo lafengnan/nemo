@@ -10,17 +10,18 @@
 
 @implementation NemoAccount
 
-@synthesize userName, passWord;
+@synthesize userName, passWord, proxyUrl;
 
 - (id)init
 {
-    return [self initWithUserName:@"test:tester" andPassword:@"testing"];
+    return [self initWithUserName:@"test:tester" andPassword:@"testing" ofUrl:nil];
 }
-- (id)initWithUserName:(NSString *)name andPassword:(NSString *)key
+- (id)initWithUserName:(NSString *)name andPassword:(NSString *)key ofUrl:(NSURL *)url
 {
     if (self = [super init]) {
         userName = name;
         passWord = key;
+        proxyUrl = url;
     }
     return self;
 }

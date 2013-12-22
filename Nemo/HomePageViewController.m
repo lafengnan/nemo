@@ -10,13 +10,14 @@
 #import "NemoAccount.h"
 #import "NemoObjectViewController.h"
 #import "NemoContainerViewController.h"
+#import "NemoClient.h"
 
 @interface HomePageViewController ()
 
 @end
 
 @implementation HomePageViewController
-@synthesize userName, passKey, logo, status;
+@synthesize userName, passKey, logo;
 
 - (id)init
 {
@@ -28,7 +29,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        [self setStatus:YES];
     }
     return self;
 }
@@ -37,16 +37,18 @@
 {
     
     NSLog(@"doLogin");
-    NemoAccount *account = [[NemoAccount alloc] init];
+    NemoClient *client = [[NemoClient alloc] init];
     
-    [account setUserName:[userName text]];
-    [account setPassWord:[passKey text]];
+    [client setUserInfo:[[NemoAccount alloc]
+                         initWithUserName:[userName text]
+                         andPassword:[passKey text]
+                         ofUrl:nil]];
     
-    if (account.passWord) {
-        NSLog(@"User:%@ Pass:%@", account.userName, account.passWord);
-        [self setStatus:NO];
-        // Move to host page
-        NSLog(@"change views");
+    
+    if ([[client userInfo] passWord] &&
+        [client isUserInfoValid]) {
+        NSLog(@"User:%@ Pass:%@", client.userInfo.userName, client.userInfo.passWord);
+    
         UITabBarController *tabBarController = [[UITabBarController alloc] init];
         
         NemoContainerViewController *containerVc = [[NemoContainerViewController alloc] init];
@@ -61,16 +63,27 @@
         [self presentViewController:tabBarController animated:YES completion:^(){
         }];
     }
+    else
+    {
+        NSError *error = [[NSError alloc] initWithDomain:@"isUserInfoValid" code:1 userInfo:nil];
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid User or Password" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+    }
 }
 
 // Inplement UITextFieldDeleget
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
+    
+    // Move textfield frame as per textfied.tag
+    // Otherwise the password textfield frame will be covered
+    // by popup keyboard
     NSTimeInterval animationDuration = 0.30f;
     CGRect frame = self.view.frame;
-    frame.origin.y -=120;
-    frame.size.height +=120;
+    frame.origin.y -=120*(1 + 0.5 * textField.tag);
+    frame.size.height +=120*(1 + 0.5 * textField.tag);
     self.view.frame = frame;
     [UIView beginAnimations:@"ResizeView" context:nil];
     [UIView setAnimationDuration:animationDuration];
@@ -83,8 +96,8 @@
 {
     NSTimeInterval animationDuration = 0.30f;
     CGRect frame = self.view.frame;
-    frame.origin.y +=120;
-    frame.size.height -=120;
+    frame.origin.y +=120*(1 + 0.5 * textField.tag);
+    frame.size.height -=120*(1 + 0.5 * textField.tag);
     self.view.frame = frame;
     //self.view移回原位置
     [UIView beginAnimations:@"ResizeView" context:nil];

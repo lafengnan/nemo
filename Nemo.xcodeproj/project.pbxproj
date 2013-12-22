@@ -28,6 +28,7 @@
 		8F5196C818620CD800D997F3 /* cloud3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8F5196C718620CD800D997F3 /* cloud3.jpg */; };
 		8F5196CA18620E4C00D997F3 /* cloud4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8F5196C918620E4C00D997F3 /* cloud4.jpg */; };
 		8F5196CC1862100000D997F3 /* loading.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8F5196CB18620FFF00D997F3 /* loading.jpg */; };
+		8F9553F418671FCA00F432CF /* NemoClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F9553F318671FCA00F432CF /* NemoClient.m */; };
 		8F959E3D18633D070096CED8 /* cloud.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F959E3C18633D070096CED8 /* cloud.png */; };
 		8F959E401863401A0096CED8 /* NemoAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F959E3F1863401A0096CED8 /* NemoAccount.m */; };
 		8F959E4718634CBE0096CED8 /* NemoContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F959E4618634CBE0096CED8 /* NemoContainerViewController.m */; };
@@ -71,6 +72,8 @@
 		8F5196C718620CD800D997F3 /* cloud3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = cloud3.jpg; sourceTree = "<group>"; };
 		8F5196C918620E4C00D997F3 /* cloud4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = cloud4.jpg; sourceTree = "<group>"; };
 		8F5196CB18620FFF00D997F3 /* loading.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = loading.jpg; sourceTree = "<group>"; };
+		8F9553F218671FCA00F432CF /* NemoClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoClient.h; sourceTree = "<group>"; };
+		8F9553F318671FCA00F432CF /* NemoClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoClient.m; sourceTree = "<group>"; };
 		8F959E3C18633D070096CED8 /* cloud.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloud.png; sourceTree = "<group>"; };
 		8F959E3E1863401A0096CED8 /* NemoAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoAccount.h; sourceTree = SOURCE_ROOT; };
 		8F959E3F1863401A0096CED8 /* NemoAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoAccount.m; sourceTree = SOURCE_ROOT; };
@@ -204,6 +207,8 @@
 			children = (
 				8F959E3F1863401A0096CED8 /* NemoAccount.m */,
 				8F959E3E1863401A0096CED8 /* NemoAccount.h */,
+				8F9553F218671FCA00F432CF /* NemoClient.h */,
+				8F9553F318671FCA00F432CF /* NemoClient.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -316,6 +321,7 @@
 				8F959E4A18634D250096CED8 /* NemoObjectViewController.m in Sources */,
 				8F959E401863401A0096CED8 /* NemoAccount.m in Sources */,
 				8F51968B1861E70E00D997F3 /* main.m in Sources */,
+				8F9553F418671FCA00F432CF /* NemoClient.m in Sources */,
 				8F51968F1861E70E00D997F3 /* NemoAppDelegate.m in Sources */,
 				8F5196B31861EE0200D997F3 /* HomePageViewController.m in Sources */,
 				8F959E4718634CBE0096CED8 /* NemoContainerViewController.m in Sources */,

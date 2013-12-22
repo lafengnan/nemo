@@ -12,7 +12,8 @@
 
 @property NSString *userName;
 @property NSString *passWord;
+@property NSURL *proxyUrl;
 
-- (id)initWithUserName:(NSString *)userName andPassword:(NSString*)passWord;
+- (id)initWithUserName:(NSString *)userName andPassword:(NSString*)passWord ofUrl:(NSURL *)url;
 
 @end
