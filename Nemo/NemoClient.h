@@ -8,13 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
-@class NemoAccount;
 
 @interface NemoClient : NSObject
 
-@property (nonatomic, retain) NemoAccount *userInfo;
+@property (nonatomic, retain)NSString *userName;          // User name of Nemo
+@property (nonatomic, retain)NSString *passWord;          // Password of the user
+@property (nonatomic, copy)NSURL *storageUrl;             // Proxy url of swift-backend
+@property (nonatomic, retain)NSDictionary *metaData;      // The metadata which will be set
 
--(id)initWithUserInfo:(NemoAccount *)user;
--(BOOL)isUserInfoValid;
+
+
+-(id)initUser:(NSString *)user withPassword:(NSString *)passwd forUrl:(NSURL *)url withMeta:(NSDictionary *)meta;
+-(NSString *)getToken;
+
 
 @end

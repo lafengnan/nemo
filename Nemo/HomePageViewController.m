@@ -7,7 +7,6 @@
 //
 
 #import "HomePageViewController.h"
-#import "NemoAccount.h"
 #import "NemoObjectViewController.h"
 #import "NemoContainerViewController.h"
 #import "NemoClient.h"
@@ -38,16 +37,12 @@
     
     NSLog(@"doLogin");
     NemoClient *client = [[NemoClient alloc] init];
-    
-    [client setUserInfo:[[NemoAccount alloc]
-                         initWithUserName:[userName text]
-                         andPassword:[passKey text]
-                         ofUrl:nil]];
+
     
     
-    if ([[client userInfo] passWord] &&
-        [client isUserInfoValid]) {
-        NSLog(@"User:%@ Pass:%@", client.userInfo.userName, client.userInfo.passWord);
+    if ([client userName] &&
+        [client passWord]) {
+        NSLog(@"User:%@ Pass:%@", client.userName, client.passWord);
     
         UITabBarController *tabBarController = [[UITabBarController alloc] init];
         
