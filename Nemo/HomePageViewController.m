@@ -43,6 +43,7 @@
     [client authentication:@"tempAuth"];
     
     
+    
     if ([client userName] &&
         [client passWord]) {
         NSLog(@"UserName: %@ PassWord: %@", client.userName, client.passWord);
