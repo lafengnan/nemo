@@ -9,17 +9,19 @@
 #import <Foundation/Foundation.h>
 
 
-@interface NemoClient : NSObject
+@interface NemoClient : AFHTTPSessionManager
 
 @property (nonatomic, retain)NSString *userName;          // User name of Nemo
 @property (nonatomic, retain)NSString *passWord;          // Password of the user
-@property (nonatomic, copy)NSURL *storageUrl;             // Proxy url of swift-backend
-@property (nonatomic, retain)NSDictionary *metaData;      // The metadata which will be set
 
+-(id)initUser:(NSString *)user withPassword:(NSString *)passwd;
 
-
--(id)initUser:(NSString *)user withPassword:(NSString *)passwd forUrl:(NSURL *)url withMeta:(NSDictionary *)meta;
--(NSString *)getToken;
-
+- (NSDictionary *)setHttpHeader:(NSDictionary *)headerDict;
+- (BOOL)authentication:(NSString *)authType;
+- (BOOL)swiftPutPath:(NSString *)path container:(NSString *)con object:(NSString *)obj;
+- (BOOL)swiftPostPath:(NSString *)path container:(NSString *)con object:(NSString *)obj;
+- (BOOL)swiftGetContainer:(NSString *)con object:(NSString *)obj;
+- (BOOL)swiftHeadContainer:(NSString *)con object:(NSString *)obj;
+- (BOOL)swiftDeleteContainer:(NSString *)con object:(NSString *)obj;
 
 @end

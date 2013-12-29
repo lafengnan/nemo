@@ -37,12 +37,15 @@
     
     NSLog(@"doLogin");
     NemoClient *client = [[NemoClient alloc] init];
-
+    [client setUserName:[userName text]];
+    [client setPassWord:[passKey text]];
+    
+    [client authentication:@"tempAuth"];
     
     
     if ([client userName] &&
         [client passWord]) {
-        NSLog(@"User:%@ Pass:%@", client.userName, client.passWord);
+        NSLog(@"UserName: %@ PassWord: %@", client.userName, client.passWord);
     
         UITabBarController *tabBarController = [[UITabBarController alloc] init];
         
