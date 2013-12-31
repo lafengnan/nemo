@@ -7,6 +7,7 @@
 //
 
 #import "NemoContainerViewController.h"
+#import "NemoClient.h"
 
 @implementation NemoContainerViewController
 
@@ -25,6 +26,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+     NSLog(@"Get to Container view");
+    // 1. Get client instance
+    NemoClient *client = [NemoClient client];
+    [client displayClientInfo];
+    // 2. display containers
+    //[client nemoGetAccount:nil failure:nil];
+    
 }
 
 @end
