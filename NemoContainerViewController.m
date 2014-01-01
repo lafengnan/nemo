@@ -31,7 +31,29 @@
     NemoClient *client = [NemoClient client];
     [client displayClientInfo];
     // 2. display containers
-    //[client nemoGetAccount:nil failure:nil];
+   [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
+       
+       NSLog(@"contaiers: %@", containers);
+       
+   } failure:^(NSURLSessionDataTask *task, NSError *error) {
+       
+       NSLog(@"error %@", error);
+       void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
+       {
+           NSLog(@"Get Token Successful from %@", client.storageUrl);
+           NSLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
+           NSLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
+           NSLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
+           NSLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
+           NSLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
+           NSLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+           
+           NSLog(@"response--->%@", [task response]);
+           NSLog(@"account: %@", [[[client storageUrl] componentsSeparatedByString:@"/"] lastObject]);
+       };
+       
+       displayTask(task);
+   }];
     
 }
 

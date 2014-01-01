@@ -44,8 +44,8 @@
 /** Authentication shoud run in sync mode, otherwise the auth token would not be get
  *  while login view changes to table view
  */
-- (BOOL)authentication:(NSString *)authType;
-- (BOOL)getTempAuth;
+- (void)authentication:(NSString *)authType;
+- (void)getTempAuth;
 
 #pragma mark - Http Operations
 

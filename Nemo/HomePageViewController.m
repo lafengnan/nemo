@@ -10,6 +10,7 @@
 #import "NemoObjectViewController.h"
 #import "NemoContainerViewController.h"
 #import "NemoClient.h"
+#import "UIActivityIndicatorView+AFNetworking.h"
 
 @interface HomePageViewController ()
 
@@ -32,6 +33,10 @@
     return self;
 }
 
+#pragma mark - Delegate
+
+
+
 - (IBAction)doLogin:(id)sender
 {
     
@@ -41,37 +46,60 @@
     [client setUserName:[userName text]];
     [client setPassWord:[passKey text]];
     
-    void (^getAuthBlock)(void) = ^(void){
-    
+    dispatch_queue_t nemoAuthQueue = dispatch_queue_create("com.auth.nemo", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_async(nemoAuthQueue, ^{
+        
         [client authentication:@"tempAuth"];
-    };
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(),getAuthBlock);
-    
-    
-    if ([client authenticated]) {
-    
-        UITabBarController *tabBarController = [[UITabBarController alloc] init];
         
-        NemoContainerViewController *containerVc = [[NemoContainerViewController alloc] init];
-        NemoObjectViewController *objectVc = [[NemoObjectViewController alloc] init];
-        UIViewController *settingVc = [[UIViewController alloc] init];
-        [[settingVc view] setBackgroundColor:[UIColor brownColor]];
-        [[settingVc tabBarItem] setTitle:@"Setting"];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            
+            double delayInSeconds = 2.0;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+            
+            [self.loginIndicator startAnimating];
+            /** While indicator spinning, stop all interactive operations
+             */
+            [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+            
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                
+                if (client.authenticated)
+                {
+                
+                    [self.loginIndicator stopAnimating];  // Stop indicator
+                    [[UIApplication sharedApplication] endIgnoringInteractionEvents]; // Reactive interaction
+                    
+                    UITabBarController *tabBarController = [[UITabBarController alloc] init];
+                    
+                    NemoContainerViewController *containerVc = [[NemoContainerViewController alloc] init];
+                    NemoObjectViewController *objectVc = [[NemoObjectViewController alloc] init];
+                    UIViewController *settingVc = [[UIViewController alloc] init];
+                    [[settingVc view] setBackgroundColor:[UIColor brownColor]];
+                    [[settingVc tabBarItem] setTitle:@"Setting"];
+                    
+                    NSArray *viewControllers = [NSArray arrayWithObjects:containerVc, objectVc, settingVc, nil];
+                    
+                    [tabBarController setViewControllers:viewControllers];
+                    [self presentViewController:tabBarController animated:YES completion:^(){
+                    }];
+                }
+                else
+                {
+                    [self.loginIndicator stopAnimating];
+                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+                    NSError *error = [[NSError alloc] initWithDomain:@"isUserInfoValid" code:1 userInfo:nil];
+                    
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid User or Password" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                    [alert show];
+                }
+            });
+            
+            
+        });
         
-        NSArray *viewControllers = [NSArray arrayWithObjects:containerVc, objectVc, settingVc, nil];
-        
-        [tabBarController setViewControllers:viewControllers];
-        [self presentViewController:tabBarController animated:YES completion:^(){
-        }];
-    }
-    else
-    {
-        NSError *error = [[NSError alloc] initWithDomain:@"isUserInfoValid" code:1 userInfo:nil];
-        
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid User or Password" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
-    }
+    });
+    
 }
 
 // Inplement UITextFieldDeleget

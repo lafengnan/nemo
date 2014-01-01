@@ -7,10 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "NemoClient.h"
 @class NemoAccount;
 
+
 @interface HomePageViewController : UIViewController <UITextFieldDelegate>
+
 
 @property (weak, nonatomic) IBOutlet UITextField *userName;
 
@@ -18,6 +20,7 @@
 
 @property (weak, nonatomic) IBOutlet UIImageView *logo;
 
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loginIndicator;
 
 - (IBAction)doLogin:(id)sender;
 

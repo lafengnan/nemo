@@ -8,10 +8,11 @@
 
 #import "NemoClient.h"
 
+
 #define NEMO_DEBUG
 
-//static NSString const *proxyUrl = @"http://192.168.1.106:8080";
-static NSString const *proxyUrl = @"http://9.123.245.246:8080";
+static NSString const *proxyUrl = @"http://192.168.1.106:8080";
+//static NSString const *proxyUrl = @"http://9.123.245.246:8080";
 
 @implementation NemoClient
 @synthesize userName, passWord;
@@ -39,7 +40,7 @@ static id client = nil;
 
 - (id)init
 {
-    return [self initWithAuthURL:[NSURL URLWithString:(NSString *)proxyUrl] User:@"test:tester" withPassword:@"testing"];
+    return [self initWithAuthURL:[NSURL URLWithString:(NSString *)proxyUrl] User:@"invalid" withPassword:@"invalid"];
 }
 
 - (id)initWithAuthURL:(NSURL *)url User:(NSString *)user withPassword:(NSString *)passKey
@@ -69,26 +70,19 @@ static id client = nil;
 #pragma mark - authentication
 
 
-- (BOOL)authentication:(NSString *)authType
+- (void)authentication:(NSString *)authType
 {
-    BOOL rc = YES;
     
     if ([authType isEqualToString:@"tempAuth"])
     {
-        rc = [self getTempAuth];
-        
+        [self getTempAuth];
     }
-    
-    return  rc;
 }
 
 
-- (BOOL)getTempAuth
+- (void)getTempAuth
 {
     
-    __block BOOL rc = YES;
-    
-
     // 1. Set header
     [self setHttpHeader:@{@"X-Storage-User":self.userName, @"X-Storage-Pass":self.passWord}] ;
     
@@ -102,42 +96,38 @@ static id client = nil;
     
     // 3. Set NSURLSessionDataTask instance
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
-    
     // 4. Send GET request with header to authUrl
+    
+    
     task = [self GET:[self.authUrl absoluteString] parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        
         
         [self setResponse:(NSHTTPURLResponse *)[task response]];
         
         if (200 <= self.response.statusCode && self.response.statusCode <= 299) {
             self.authToken = [[self.response allHeaderFields] objectForKey:@"X-Auth-Token"];
             self.storageUrl = [[self.response allHeaderFields] objectForKey:@"X-Storage-Url"];
-            [self setAuthenticated:rc];
+            [self setAuthenticated:YES];
         }
-
-#ifdef NEMO_DEBUG
-        void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
-        {
-            NSLog(@"Get Token Successful from %@", [self.authUrl absoluteString]);
-            NSLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
-            NSLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
-            NSLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
-            NSLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
-            NSLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
-            NSLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+        
+            void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
+            {
+                NSLog(@"Get Token Successful from %@", [self.authUrl absoluteString]);
+                NSLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
+                NSLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
+                NSLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
+                NSLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
+                NSLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
+                NSLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+                
+                NSLog(@"response--->%@", [task response]);
+                NSLog(@"account: %@", [[[self storageUrl] componentsSeparatedByString:@"/"] lastObject]);
+                NSLog(@"X-Auth-Token: %@", [self authToken]);
+                NSLog(@"X-Storage-Url: %@", [self storageUrl]);
+            };
             
-            NSLog(@"response--->%@", [task response]);
-            NSLog(@"account: %@", [[[self storageUrl] componentsSeparatedByString:@"/"] lastObject]);
-            NSLog(@"X-Auth-Token: %@", [self authToken]);
-            NSLog(@"X-Storage-Url: %@", [self storageUrl]);
-        };
-
-        displayTask(task);
-       
-#endif
+            displayTask(task);
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        
         
         [self setResponse:(NSHTTPURLResponse *)[task response]];
         void (^displayErrorResponse)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
@@ -148,27 +138,32 @@ static id client = nil;
         };
         
         displayErrorResponse(task);
+        
+        
+        
     }];
-    
-    return  rc;
 }
-
 
 #pragma mark - HTTP Operations
 
-- (void)nemoGetAccount:(void (^)(NSArray *, NSError *))successHandler failure:(void (^)(NSURLSessionDataTask *, NSError *))failureHandler
+- (void)nemoGetAccount:(void (^)(NSArray *containers, NSError *error))successHandler failure:(void (^)(NSURLSessionDataTask *task, NSError *error))failureHandler
 {
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
+    AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
+    [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
+    [self setResponseSerializer:resSerializer];
     if (self.authenticated) {
         [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
     }
     
     task = [self GET:self.storageUrl parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        NSArray *containers = [[NSArray alloc] init];
+        
+        NSDictionary *containers = [[NSDictionary alloc] initWithContentsOfFile:[[NSString alloc] initWithData:responseObject encoding:0]];
         NSLog(@"response: %@", [task response]);
+        NSLog(@"resopnseObject: %@", containers);
         if (successHandler) {
-            successHandler(containers,nil);
+            successHandler(containers, nil);
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
@@ -181,6 +176,7 @@ static id client = nil;
 }
 
 #pragma mark -
+
 - (void)displayClientInfo
 {
     if (self == [NemoClient client]) {
@@ -193,6 +189,10 @@ static id client = nil;
         NSLog(@"storage url: %@", self.storageUrl);
     }
 }
+
+
+#pragma mark - Delegate 
+
 
 
 @end
