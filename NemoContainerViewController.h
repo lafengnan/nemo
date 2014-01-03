@@ -10,4 +10,9 @@
 
 @interface NemoContainerViewController : UITableViewController
 
+@property (nonatomic, retain) NSArray *containerList;
+
+
+- (id)initWithContainerList:(NSArray *)containers;
+
 @end

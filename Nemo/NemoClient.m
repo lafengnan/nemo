@@ -11,11 +11,12 @@
 
 #define NEMO_DEBUG
 
-static NSString const *proxyUrl = @"http://192.168.1.106:8080";
+//static NSString const *proxyUrl = @"http://192.168.1.106:8080";
+static NSString const *proxyUrl = @"http://172.16.218.129:8080";
 //static NSString const *proxyUrl = @"http://9.123.245.246:8080";
 
 @implementation NemoClient
-@synthesize userName, passWord;
+@synthesize userName, passWord, containerList;
 
 
 #pragma mark - Class Method
@@ -150,6 +151,9 @@ static id client = nil;
 {
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
+    AFHTTPRequestSerializer *reqSerializer = [[AFHTTPRequestSerializer alloc] init];
+    [self setRequestSerializer:reqSerializer];
+    
     AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
     [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
     [self setResponseSerializer:resSerializer];
@@ -157,13 +161,22 @@ static id client = nil;
         [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
     }
     
-    task = [self GET:self.storageUrl parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+    AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
+    [self setResponseSerializer:jsonSerializer];
+    task = [self GET:self.storageUrl parameters:@{@"format": @"json"} success:^(NSURLSessionDataTask *task, id responseObject) {
         
-        NSDictionary *containers = [[NSDictionary alloc] initWithContentsOfFile:[[NSString alloc] initWithData:responseObject encoding:0]];
-        NSLog(@"response: %@", [task response]);
-        NSLog(@"resopnseObject: %@", containers);
+        NSArray *containers = (NSArray *)responseObject;
+        /* Init container list  here */
+        self.containerList = [[NSMutableArray alloc] init];
+        
+        for (NSDictionary *container in containers) {
+            /* Add container name into container list to display */
+            [self.containerList addObject:container[@"name"]];
+        }
+        //NSLog(@"response: %@", [task response]);
+        //NSLog(@"resopnseObject: %@", responseObject);
         if (successHandler) {
-            successHandler(containers, nil);
+            successHandler(self.containerList, nil);
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
@@ -187,6 +200,7 @@ static id client = nil;
         NSLog(@"auth url: %@", [self.authUrl absoluteString]);
         NSLog(@"auth token: %@", self.authToken);
         NSLog(@"storage url: %@", self.storageUrl);
+        NSLog(@"containers: %@", self.containerList);
     }
 }
 

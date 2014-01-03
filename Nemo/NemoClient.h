@@ -20,6 +20,7 @@
 @property (nonatomic) BOOL authenticated;                  // Set to YES when client get authenticated
 @property (nonatomic, retain) NSString *storageUrl;        // Storage url get from authentication = proxyUrl/v1/account
 @property (nonatomic, retain) NSHTTPURLResponse *response; // Response from swift-backend
+@property (nonatomic, retain) NSMutableArray *containerList; // Stores container list of account
 
 
 #pragma mark - Class method
