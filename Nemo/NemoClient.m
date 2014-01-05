@@ -25,7 +25,7 @@ static id client = nil;
 
 
 
-+ (id)client
++ (id)getClient
 {
     return client;
 }
@@ -192,7 +192,7 @@ static id client = nil;
 
 - (void)displayClientInfo
 {
-    if (self == [NemoClient client]) {
+    if (self == [NemoClient getClient]) {
         NSLog(@"Client Info:");
         NSLog(@"User Name: %@", self.userName);
         NSLog(@"Password:  %@", self.passWord);

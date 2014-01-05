@@ -32,6 +32,16 @@
 		8F959E3D18633D070096CED8 /* cloud.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F959E3C18633D070096CED8 /* cloud.png */; };
 		8F959E4718634CBE0096CED8 /* NemoContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F959E4618634CBE0096CED8 /* NemoContainerViewController.m */; };
 		8F959E4A18634D250096CED8 /* NemoObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F959E4918634D250096CED8 /* NemoObjectViewController.m */; };
+		8FA8B7B01879A2F6003EF3FD /* EGORefreshTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA8B7AF1879A2F6003EF3FD /* EGORefreshTableHeaderView.m */; };
+		8FA8B7B31879A3BE003EF3FD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA8B7B21879A3BE003EF3FD /* QuartzCore.framework */; };
+		8FA8B7BD1879A414003EF3FD /* blackArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7B51879A414003EF3FD /* blackArrow.png */; };
+		8FA8B7BE1879A414003EF3FD /* blackArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7B61879A414003EF3FD /* blackArrow@2x.png */; };
+		8FA8B7BF1879A414003EF3FD /* blueArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7B71879A414003EF3FD /* blueArrow.png */; };
+		8FA8B7C01879A414003EF3FD /* blueArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7B81879A414003EF3FD /* blueArrow@2x.png */; };
+		8FA8B7C11879A414003EF3FD /* grayArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7B91879A414003EF3FD /* grayArrow.png */; };
+		8FA8B7C21879A414003EF3FD /* grayArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7BA1879A414003EF3FD /* grayArrow@2x.png */; };
+		8FA8B7C31879A414003EF3FD /* whiteArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7BB1879A414003EF3FD /* whiteArrow.png */; };
+		8FA8B7C41879A414003EF3FD /* whiteArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7BC1879A414003EF3FD /* whiteArrow@2x.png */; };
 		8FE6DA97186DBCDF003E7EC0 /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FE6DA85186DBCDF003E7EC0 /* AFHTTPRequestOperation.m */; };
 		8FE6DA98186DBCDF003E7EC0 /* AFHTTPRequestOperationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FE6DA87186DBCDF003E7EC0 /* AFHTTPRequestOperationManager.m */; };
 		8FE6DA99186DBCDF003E7EC0 /* AFHTTPSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FE6DA89186DBCDF003E7EC0 /* AFHTTPSessionManager.m */; };
@@ -97,6 +107,17 @@
 		8F959E4618634CBE0096CED8 /* NemoContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoContainerViewController.m; sourceTree = "<group>"; };
 		8F959E4818634D250096CED8 /* NemoObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoObjectViewController.h; sourceTree = "<group>"; };
 		8F959E4918634D250096CED8 /* NemoObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoObjectViewController.m; sourceTree = "<group>"; };
+		8FA8B7AE1879A2F6003EF3FD /* EGORefreshTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EGORefreshTableHeaderView.h; sourceTree = "<group>"; };
+		8FA8B7AF1879A2F6003EF3FD /* EGORefreshTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EGORefreshTableHeaderView.m; sourceTree = "<group>"; };
+		8FA8B7B21879A3BE003EF3FD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		8FA8B7B51879A414003EF3FD /* blackArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blackArrow.png; sourceTree = "<group>"; };
+		8FA8B7B61879A414003EF3FD /* blackArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blackArrow@2x.png"; sourceTree = "<group>"; };
+		8FA8B7B71879A414003EF3FD /* blueArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blueArrow.png; sourceTree = "<group>"; };
+		8FA8B7B81879A414003EF3FD /* blueArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blueArrow@2x.png"; sourceTree = "<group>"; };
+		8FA8B7B91879A414003EF3FD /* grayArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grayArrow.png; sourceTree = "<group>"; };
+		8FA8B7BA1879A414003EF3FD /* grayArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "grayArrow@2x.png"; sourceTree = "<group>"; };
+		8FA8B7BB1879A414003EF3FD /* whiteArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteArrow.png; sourceTree = "<group>"; };
+		8FA8B7BC1879A414003EF3FD /* whiteArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "whiteArrow@2x.png"; sourceTree = "<group>"; };
 		8FE6DA84186DBCDF003E7EC0 /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
 		8FE6DA85186DBCDF003E7EC0 /* AFHTTPRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPRequestOperation.m; sourceTree = "<group>"; };
 		8FE6DA86186DBCDF003E7EC0 /* AFHTTPRequestOperationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperationManager.h; sourceTree = "<group>"; };
@@ -141,6 +162,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8FA8B7B31879A3BE003EF3FD /* QuartzCore.framework in Frameworks */,
 				8FE6DABD186DE53E003E7EC0 /* MobileCoreServices.framework in Frameworks */,
 				8FE6DABB186DE34F003E7EC0 /* SystemConfiguration.framework in Frameworks */,
 				8FE6DAB9186DE2F8003E7EC0 /* CFNetwork.framework in Frameworks */,
@@ -186,6 +208,7 @@
 		8F51967D1861E70E00D997F3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8FA8B7B21879A3BE003EF3FD /* QuartzCore.framework */,
 				8FE6DABC186DE53E003E7EC0 /* MobileCoreServices.framework */,
 				8FE6DABA186DE34F003E7EC0 /* SystemConfiguration.framework */,
 				8FE6DAB8186DE2F8003E7EC0 /* CFNetwork.framework */,
@@ -271,6 +294,31 @@
 			name = Models;
 			sourceTree = "<group>";
 		};
+		8FA8B7B11879A310003EF3FD /* EGORefresh */ = {
+			isa = PBXGroup;
+			children = (
+				8FA8B7B41879A414003EF3FD /* Resources */,
+				8FA8B7AF1879A2F6003EF3FD /* EGORefreshTableHeaderView.m */,
+				8FA8B7AE1879A2F6003EF3FD /* EGORefreshTableHeaderView.h */,
+			);
+			name = EGORefresh;
+			sourceTree = "<group>";
+		};
+		8FA8B7B41879A414003EF3FD /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8FA8B7B51879A414003EF3FD /* blackArrow.png */,
+				8FA8B7B61879A414003EF3FD /* blackArrow@2x.png */,
+				8FA8B7B71879A414003EF3FD /* blueArrow.png */,
+				8FA8B7B81879A414003EF3FD /* blueArrow@2x.png */,
+				8FA8B7B91879A414003EF3FD /* grayArrow.png */,
+				8FA8B7BA1879A414003EF3FD /* grayArrow@2x.png */,
+				8FA8B7BB1879A414003EF3FD /* whiteArrow.png */,
+				8FA8B7BC1879A414003EF3FD /* whiteArrow@2x.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		8FE6DA83186DBCDF003E7EC0 /* AFNetworking */ = {
 			isa = PBXGroup;
 			children = (
@@ -300,6 +348,7 @@
 		8FE6DAA0186DBCF9003E7EC0 /* Third Party */ = {
 			isa = PBXGroup;
 			children = (
+				8FA8B7B11879A310003EF3FD /* EGORefresh */,
 				8FE6DA83186DBCDF003E7EC0 /* AFNetworking */,
 				8FE6DAA1186DBD44003E7EC0 /* UIKit+AFNetworking */,
 			);
@@ -405,16 +454,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				8F5196891861E70E00D997F3 /* InfoPlist.strings in Resources */,
+				8FA8B7BD1879A414003EF3FD /* blackArrow.png in Resources */,
 				8F5196BC1861FF4000D997F3 /* logo.png in Resources */,
 				8F5196CC1862100000D997F3 /* loading.jpg in Resources */,
 				8F5196B91861F54D00D997F3 /* HomePageViewController.xib in Resources */,
 				8F5196BE1862040B00D997F3 /* log-big.png in Resources */,
 				8F959E3D18633D070096CED8 /* cloud.png in Resources */,
+				8FA8B7C31879A414003EF3FD /* whiteArrow.png in Resources */,
 				8F5196C01862046900D997F3 /* logo-2x.png in Resources */,
+				8FA8B7C41879A414003EF3FD /* whiteArrow@2x.png in Resources */,
 				8F5196C618620B1E00D997F3 /* cloud2.jpg in Resources */,
 				8F5196CA18620E4C00D997F3 /* cloud4.jpg in Resources */,
 				8F5196C818620CD800D997F3 /* cloud3.jpg in Resources */,
+				8FA8B7BF1879A414003EF3FD /* blueArrow.png in Resources */,
+				8FA8B7C01879A414003EF3FD /* blueArrow@2x.png in Resources */,
 				8F5196911861E70E00D997F3 /* Images.xcassets in Resources */,
+				8FA8B7C11879A414003EF3FD /* grayArrow.png in Resources */,
+				8FA8B7BE1879A414003EF3FD /* blackArrow@2x.png in Resources */,
+				8FA8B7C21879A414003EF3FD /* grayArrow@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,6 +511,7 @@
 				8F959E4718634CBE0096CED8 /* NemoContainerViewController.m in Sources */,
 				8FE6DA9A186DBCDF003E7EC0 /* AFNetworkReachabilityManager.m in Sources */,
 				8FE6DAB5186DBD44003E7EC0 /* UIImageView+AFNetworking.m in Sources */,
+				8FA8B7B01879A2F6003EF3FD /* EGORefreshTableHeaderView.m in Sources */,
 				8FE6DA98186DBCDF003E7EC0 /* AFHTTPRequestOperationManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -42,7 +42,7 @@
     
     NSLog(@"doLogin");
     [NemoClient initialize];
-    NemoClient *client = [NemoClient client];
+    NemoClient *client = [NemoClient getClient];
     [client setUserName:[userName text]];
     [client setPassWord:[passKey text]];
     

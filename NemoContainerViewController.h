@@ -7,12 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "EGORefreshTableHeaderView.h"
 
-@interface NemoContainerViewController : UITableViewController
-
+@interface NemoContainerViewController : UITableViewController <EGORefreshTableHeaderDelegate>
+{
+    BOOL isflage;
+    BOOL _reloading;
+    EGORefreshTableHeaderView *_refreshHeaderView;
+}
 @property (nonatomic, retain) NSArray *containerList;
 
 
 - (id)initWithContainerList:(NSArray *)containers;
+//- (void)reloadTableViewDataSource;
+//- (void)doneLoadingTableViewData;
+- (void)updateContainerList;
+- (void)doneUpdatingContainerList;
 
 @end

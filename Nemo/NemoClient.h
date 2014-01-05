@@ -25,7 +25,7 @@
 
 #pragma mark - Class method
 
-+ (id)client;
++ (id)getClient;
 
 #pragma mark - Constructors
 
