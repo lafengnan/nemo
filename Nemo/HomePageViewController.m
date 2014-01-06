@@ -77,10 +77,14 @@
                     [[settingVc view] setBackgroundColor:[UIColor brownColor]];
                     [[settingVc tabBarItem] setTitle:@"Setting"];
                     
-                    NSArray *viewControllers = [NSArray arrayWithObjects:containerVc, objectVc, settingVc, nil];
+                    UINavigationController *containerNav = [[UINavigationController alloc] initWithRootViewController:containerVc];
+                    [containerNav setTitle:@"Container List"];
+                    
+                    NSArray *viewControllers = [NSArray arrayWithObjects:containerNav, objectVc, settingVc, nil];
                     
                     [tabBarController setViewControllers:viewControllers];
                     [self presentViewController:tabBarController animated:YES completion:^(){
+                        
                     }];
                 }
                 else

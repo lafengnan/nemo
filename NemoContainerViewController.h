@@ -15,7 +15,7 @@
     BOOL _reloading;
     EGORefreshTableHeaderView *_refreshHeaderView;
 }
-@property (nonatomic, retain) NSArray *containerList;
+@property (nonatomic, retain) NSMutableArray *containerList;
 
 
 - (id)initWithContainerList:(NSArray *)containers;

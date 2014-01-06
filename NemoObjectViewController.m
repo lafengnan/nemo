@@ -16,6 +16,7 @@
     if (self) {
         UITabBarItem *tbi = [self tabBarItem];
         [tbi setTitle:@"Object"];
+        [tbi setImage:[UIImage imageNamed:@"object_32"]];
     }
     return self;
     

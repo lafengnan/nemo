@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8F02C193187AC0CD00F0A92A /* container_64.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C192187AC0CD00F0A92A /* container_64.png */; };
+		8F02C195187AC16A00F0A92A /* container_32.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C194187AC16A00F0A92A /* container_32.png */; };
+		8F02C197187AC2E200F0A92A /* container_item_64.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C196187AC2E200F0A92A /* container_item_64.png */; };
+		8F02C199187AC36B00F0A92A /* container_item_32.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C198187AC36B00F0A92A /* container_item_32.png */; };
+		8F02C19B187AD13100F0A92A /* object_32.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C19A187AD13100F0A92A /* object_32.png */; };
+		8F02C19F187AD9DA00F0A92A /* NemoContainerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.m */; };
+		8F02C1A0187AD9DA00F0A92A /* NemoContainerDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C19E187AD9DA00F0A92A /* NemoContainerDetailViewController.xib */; };
+		8F0BC175187B0DCA0038C96E /* NemoContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F0BC174187B0DCA0038C96E /* NemoContainer.m */; };
 		8F51967F1861E70E00D997F3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F51967E1861E70E00D997F3 /* Foundation.framework */; };
 		8F5196811861E70E00D997F3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F5196801861E70E00D997F3 /* CoreGraphics.framework */; };
 		8F5196831861E70E00D997F3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F5196821861E70E00D997F3 /* UIKit.framework */; };
@@ -74,6 +82,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8F02C192187AC0CD00F0A92A /* container_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container_64.png; sourceTree = "<group>"; };
+		8F02C194187AC16A00F0A92A /* container_32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container_32.png; sourceTree = "<group>"; };
+		8F02C196187AC2E200F0A92A /* container_item_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container_item_64.png; sourceTree = "<group>"; };
+		8F02C198187AC36B00F0A92A /* container_item_32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container_item_32.png; sourceTree = "<group>"; };
+		8F02C19A187AD13100F0A92A /* object_32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = object_32.png; sourceTree = "<group>"; };
+		8F02C19C187AD9DA00F0A92A /* NemoContainerDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoContainerDetailViewController.h; sourceTree = "<group>"; };
+		8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoContainerDetailViewController.m; sourceTree = "<group>"; };
+		8F02C19E187AD9DA00F0A92A /* NemoContainerDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NemoContainerDetailViewController.xib; sourceTree = "<group>"; };
+		8F0BC173187B0DCA0038C96E /* NemoContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoContainer.h; sourceTree = "<group>"; };
+		8F0BC174187B0DCA0038C96E /* NemoContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoContainer.m; sourceTree = "<group>"; };
 		8F51967B1861E70E00D997F3 /* Nemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F51967E1861E70E00D997F3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8F5196801861E70E00D997F3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -236,6 +254,11 @@
 		8F5196851861E70E00D997F3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				8F02C192187AC0CD00F0A92A /* container_64.png */,
+				8F02C194187AC16A00F0A92A /* container_32.png */,
+				8F02C196187AC2E200F0A92A /* container_item_64.png */,
+				8F02C198187AC36B00F0A92A /* container_item_32.png */,
+				8F02C19A187AD13100F0A92A /* object_32.png */,
 				8F5196CB18620FFF00D997F3 /* loading.jpg */,
 				8F5196C918620E4C00D997F3 /* cloud4.jpg */,
 				8F5196C718620CD800D997F3 /* cloud3.jpg */,
@@ -275,6 +298,9 @@
 			children = (
 				8F959E4518634CBE0096CED8 /* NemoContainerViewController.h */,
 				8F959E4618634CBE0096CED8 /* NemoContainerViewController.m */,
+				8F02C19C187AD9DA00F0A92A /* NemoContainerDetailViewController.h */,
+				8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.m */,
+				8F02C19E187AD9DA00F0A92A /* NemoContainerDetailViewController.xib */,
 				8F959E4818634D250096CED8 /* NemoObjectViewController.h */,
 				8F959E4918634D250096CED8 /* NemoObjectViewController.m */,
 				8F5196B11861EE0200D997F3 /* HomePageViewController.h */,
@@ -288,6 +314,8 @@
 		8F959E411863402A0096CED8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				8F0BC173187B0DCA0038C96E /* NemoContainer.h */,
+				8F0BC174187B0DCA0038C96E /* NemoContainer.m */,
 				8F9553F218671FCA00F432CF /* NemoClient.h */,
 				8F9553F318671FCA00F432CF /* NemoClient.m */,
 			);
@@ -461,17 +489,23 @@
 				8F5196BE1862040B00D997F3 /* log-big.png in Resources */,
 				8F959E3D18633D070096CED8 /* cloud.png in Resources */,
 				8FA8B7C31879A414003EF3FD /* whiteArrow.png in Resources */,
+				8F02C199187AC36B00F0A92A /* container_item_32.png in Resources */,
+				8F02C1A0187AD9DA00F0A92A /* NemoContainerDetailViewController.xib in Resources */,
 				8F5196C01862046900D997F3 /* logo-2x.png in Resources */,
 				8FA8B7C41879A414003EF3FD /* whiteArrow@2x.png in Resources */,
 				8F5196C618620B1E00D997F3 /* cloud2.jpg in Resources */,
 				8F5196CA18620E4C00D997F3 /* cloud4.jpg in Resources */,
+				8F02C19B187AD13100F0A92A /* object_32.png in Resources */,
 				8F5196C818620CD800D997F3 /* cloud3.jpg in Resources */,
 				8FA8B7BF1879A414003EF3FD /* blueArrow.png in Resources */,
+				8F02C197187AC2E200F0A92A /* container_item_64.png in Resources */,
 				8FA8B7C01879A414003EF3FD /* blueArrow@2x.png in Resources */,
 				8F5196911861E70E00D997F3 /* Images.xcassets in Resources */,
+				8F02C193187AC0CD00F0A92A /* container_64.png in Resources */,
 				8FA8B7C11879A414003EF3FD /* grayArrow.png in Resources */,
 				8FA8B7BE1879A414003EF3FD /* blackArrow@2x.png in Resources */,
 				8FA8B7C21879A414003EF3FD /* grayArrow@2x.png in Resources */,
+				8F02C195187AC16A00F0A92A /* container_32.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -496,10 +530,12 @@
 				8FE6DAB3186DBD44003E7EC0 /* UIAlertView+AFNetworking.m in Sources */,
 				8F51968B1861E70E00D997F3 /* main.m in Sources */,
 				8FE6DA9E186DBCDF003E7EC0 /* AFURLResponseSerialization.m in Sources */,
+				8F0BC175187B0DCA0038C96E /* NemoContainer.m in Sources */,
 				8FE6DAB4186DBD44003E7EC0 /* UIButton+AFNetworking.m in Sources */,
 				8F9553F418671FCA00F432CF /* NemoClient.m in Sources */,
 				8FE6DAB2186DBD44003E7EC0 /* UIActivityIndicatorView+AFNetworking.m in Sources */,
 				8FE6DA9D186DBCDF003E7EC0 /* AFURLRequestSerialization.m in Sources */,
+				8F02C19F187AD9DA00F0A92A /* NemoContainerDetailViewController.m in Sources */,
 				8FE6DAB1186DBD44003E7EC0 /* AFNetworkActivityIndicatorManager.m in Sources */,
 				8FE6DA9B186DBCDF003E7EC0 /* AFSecurityPolicy.m in Sources */,
 				8FE6DA97186DBCDF003E7EC0 /* AFHTTPRequestOperation.m in Sources */,
@@ -629,7 +665,6 @@
 		8F5196A81861E70E00D997F3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Nemo/Nemo-Prefix.pch";
@@ -642,7 +677,6 @@
 		8F5196A91861E70E00D997F3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Nemo/Nemo-Prefix.pch";

@@ -8,6 +8,8 @@
 
 #import "NemoContainerViewController.h"
 #import "NemoClient.h"
+#import "NemoContainerDetailViewController.h"
+#import "NemoContainer.h"
 
 @implementation NemoContainerViewController
 @synthesize containerList;
@@ -23,10 +25,14 @@
 {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
+        
+        // Set tabbar
         UITabBarItem *tbi = [self tabBarItem];
         [tbi setTitle:@"Container"];
-        self.containerList = [NSArray arrayWithArray:containers];
-          
+        [tbi setImage:[UIImage imageNamed:@"container_item_32"]];
+        self.containerList = [NSMutableArray arrayWithArray:containers];
+        // Set UINavigationItem
+        [[self navigationItem] setTitle:@"My Containers"];
     }
     
     return self;
@@ -44,7 +50,7 @@
     dispatch_async(nemoGetAccountQueue, ^{
         [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
             /* Copy container list here */
-            [self setContainerList:containers];
+            [self setContainerList:(NSMutableArray *)containers];
             [[self tableView] reloadData];
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
             
@@ -70,7 +76,6 @@
     if (_refreshHeaderView == nil) {
         EGORefreshTableHeaderView *view1 =
         [[EGORefreshTableHeaderView alloc]initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height)];
-        //注意下拉框的位置描述！要把tableViewImage换成自己定义的tableview！
         view1.delegate = self;
         [self.tableView addSubview:view1];//这里要把view加到自己定义的tableview上
         _refreshHeaderView = view1;
@@ -83,7 +88,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSLog(@"display %u lines", [self.containerList count]);
+    NSLog(@"display %u lines", (unsigned int)[self.containerList count]);
     return [self.containerList count];
 }
 
@@ -92,18 +97,64 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ContainerList"];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ContainerList"];
+        [cell.imageView setImage:[UIImage imageNamed:@"container_32.png"]];
     }
     
-    NSString *container = [containerList objectAtIndex:[indexPath row]];
+    NSString *containerName = [containerList objectAtIndex:[indexPath row]];
   
-    [[cell textLabel] setText:container];
+    [[cell textLabel] setText:containerName];
+    [[cell detailTextLabel] setText:[[NSDate date] description]];
+    [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
     
     return cell;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+//{
+//    return [NSString stringWithFormat:@"Container List"];
+//}
+
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return [NSString stringWithFormat:@"Container List"];
+    return YES;
+}
+
+/** Delete the container while left moving tableviewcell
+ *  Container could not be delete unless there is no object
+ *  in the container 
+ */
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [self.containerList removeObjectAtIndex:indexPath.row];
+        
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    }
+    
+}
+
+//- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+//{
+//    
+//
+//}
+
+/** If one row is selected the detail view pops from right
+ *  Using a navigationcontroller to controll NemoContainerDetailViewController
+ *  and the root controller
+ */
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NemoContainerDetailViewController *containerDetailVc = [[NemoContainerDetailViewController alloc] init];
+    
+    NemoContainer *container = [[NemoContainer alloc] initWithContainerName:[containerList objectAtIndex:[indexPath row]] createAt:nil metaData:nil];
+    
+    [containerDetailVc setContainer:container];
+    
+    [self.navigationController pushViewController:containerDetailVc animated:YES];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 #pragma mark -  Data Source Loading/Reloading methods
@@ -116,7 +167,7 @@
     NemoClient *client = [NemoClient getClient];
     [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
         /* Copy container list here */
-        [self setContainerList:containers];
+        [self setContainerList:(NSMutableArray *)containers];
         [[self tableView] reloadData];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         
