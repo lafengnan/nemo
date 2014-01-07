@@ -51,13 +51,13 @@
         [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
             /* Copy container list here */
             [self setContainerList:(NSMutableArray *)containers];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"GET Account" object:nil];
             
             /* Do HEAD operation here to display cell detail lable */
             for (NemoContainer *con in self.containerList) {
                 [client nemoHeadContainer:con.containerName success:^(NSString *containerName, NSError *jsonError) {
                     NSLog(@"container: %@", containerName);
                     NSLog(@"tableviw did load--->HEAD: %@", con.metaData);
+                    [self.tableView reloadData];
                     
                 } failure:^(NSURLSessionTask *task, NSError *error) {
                     ;
@@ -125,7 +125,14 @@
     NemoContainer *container = [containerList objectAtIndex:[indexPath row]];
     
     [[cell textLabel] setText:container.containerName];
-    [[cell detailTextLabel] setText:container.metaData[@"X-Timestamp"]];
+    
+    /** Set date format and displays it **/
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd 'at' HH:mm"];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:[container.metaData[@"X-Timestamp"] doubleValue]];
+    NSString *formattedDateString = [@"Last Update: " stringByAppendingString:[dateFormatter stringFromDate:date]];
+
+    [[cell detailTextLabel] setText:formattedDateString];
     [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
     
     
@@ -191,6 +198,16 @@
     [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
         /* Copy container list here */
         [self setContainerList:(NSMutableArray *)containers];
+        
+        for (NemoContainer *con in self.containerList) {
+            [client nemoHeadContainer:con.containerName success:^(NSString *containerName, NSError *jsonError) {
+            [self.tableView reloadData];
+                
+            } failure:^(NSURLSessionTask *task, NSError *error) {
+                ;
+            }];
+        }
+
         [[self tableView] reloadData];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         

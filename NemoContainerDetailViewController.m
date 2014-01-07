@@ -10,6 +10,11 @@
 #import "NemoContainer.h"
 #import "NemoClient.h"
 
+#define KB (2ll << 10)
+#define MB (2ll << 20)
+#define GB (2ll << 30)
+#define TB (2ll << 40)
+
 @interface NemoContainerDetailViewController ()
 
 @end
@@ -46,7 +51,32 @@
         [self.objectCount setText:container.metaData[@"X-Container-Object-Count"]];
         
         
-        [self.bytesUsed setText:[self.container.metaData[@"X-Container-Bytes-Used"] stringByAppendingString:@"Bytes"]];
+        NSString *bytesUsedUnit = @" B";
+        NSInteger bytes = [self.container.metaData[@"X-Container-Bytes-Used"] integerValue];
+        
+        if ( bytes > KB && bytes < MB) {
+            
+            bytesUsedUnit = @" KB";
+            bytes /= KB;
+        }
+        else if ( bytes > MB &&
+                 bytes < GB)
+        {
+            bytesUsedUnit = @" MB";
+            bytes /= MB;
+        }
+        else if ( bytes > GB && bytes < TB)
+        {
+            bytesUsedUnit = @" GB";
+            bytes /= GB;
+        }
+        else if (bytes > TB)
+        {
+            bytes /= TB;
+            bytesUsedUnit = @" TB";
+        }
+        
+        [self.bytesUsed setText:[NSString stringWithFormat:@"%ld %@", bytes, bytesUsedUnit]];
 
         [[self navigationItem] setTitle:self.container.containerName];
         [self.view setNeedsDisplay];
