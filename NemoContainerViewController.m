@@ -46,12 +46,27 @@
     NemoClient *client = [NemoClient getClient];
     //[client displayClientInfo];
     // 2. display containers
-    dispatch_queue_t nemoGetAccountQueue = dispatch_queue_create("com.get.account.nemo", DISPATCH_QUEUE_CONCURRENT);
-    dispatch_async(nemoGetAccountQueue, ^{
+//    dispatch_queue_t nemoGetAccountQueue = dispatch_queue_create("com.get.account.nemo", DISPATCH_QUEUE_CONCURRENT);
+//    dispatch_async(nemoGetAccountQueue, ^{
         [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
             /* Copy container list here */
             [self setContainerList:(NSMutableArray *)containers];
-            [[self tableView] reloadData];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"GET Account" object:nil];
+            
+            /* Do HEAD operation here to display cell detail lable */
+            for (NemoContainer *con in self.containerList) {
+                [client nemoHeadContainer:con.containerName success:^(NSString *containerName, NSError *jsonError) {
+                    NSLog(@"container: %@", containerName);
+                    NSLog(@"tableviw did load--->HEAD: %@", con.metaData);
+                    
+                } failure:^(NSURLSessionTask *task, NSError *error) {
+                    ;
+                }];
+
+            }
+            
+            [self.tableView reloadData];
+            
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
             
             NSLog(@"error %@", error);
@@ -71,7 +86,10 @@
             
             displayTask(task);
         }];
-    });
+//    });
+    
+    
+
     
     if (_refreshHeaderView == nil) {
         EGORefreshTableHeaderView *view1 =
@@ -100,11 +118,16 @@
         [cell.imageView setImage:[UIImage imageNamed:@"container_32.png"]];
     }
     
-    NSString *containerName = [containerList objectAtIndex:[indexPath row]];
-  
-    [[cell textLabel] setText:containerName];
-    [[cell detailTextLabel] setText:[[NSDate date] description]];
+    /** detailTextLabel will displays meta data of the 
+     *  container, so that a head operation needs to be 
+     *  performed here.
+     */
+    NemoContainer *container = [containerList objectAtIndex:[indexPath row]];
+    
+    [[cell textLabel] setText:container.containerName];
+    [[cell detailTextLabel] setText:container.metaData[@"X-Timestamp"]];
     [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+    
     
     return cell;
 }
@@ -149,7 +172,7 @@
 {
     NemoContainerDetailViewController *containerDetailVc = [[NemoContainerDetailViewController alloc] init];
     
-    NemoContainer *container = [[NemoContainer alloc] initWithContainerName:[containerList objectAtIndex:[indexPath row]] createAt:nil metaData:nil];
+    NemoContainer *container = [containerList objectAtIndex:[indexPath row]];
     
     [containerDetailVc setContainer:container];
     

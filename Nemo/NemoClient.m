@@ -7,6 +7,7 @@
 //
 
 #import "NemoClient.h"
+#import "NemoContainer.h"
 
 
 #define NEMO_DEBUG
@@ -165,16 +166,20 @@ static id client = nil;
     [self setResponseSerializer:jsonSerializer];
     task = [self GET:self.storageUrl parameters:@{@"format": @"json"} success:^(NSURLSessionDataTask *task, id responseObject) {
         
-        NSArray *containers = (NSArray *)responseObject;
+//        NSDictionary *headers = [(NSHTTPURLResponse* )[task response] allHeaderFields];
+        
         /* Init container list  here */
         self.containerList = [[NSMutableArray alloc] init];
         
-        for (NSDictionary *container in containers) {
-            /* Add container name into container list to display */
-            [self.containerList addObject:container[@"name"]];
+        for (NSDictionary *con in (NSArray*)responseObject) {
+            /** Initialize NemoContainer instance with container name 
+             *  and then add to container list of the account 
+             */
+            NemoContainer *container = [[NemoContainer alloc] initWithContainerName:con[@"name"] withMetaData:nil];
+            [self.containerList addObject:container];
         }
-        //NSLog(@"response: %@", [task response]);
-        //NSLog(@"resopnseObject: %@", responseObject);
+//        NSLog(@"response: %@", [task response]);
+//        NSLog(@"resopnseObject: %@", responseObject);
         if (successHandler) {
             successHandler(self.containerList, nil);
         }
@@ -186,6 +191,53 @@ static id client = nil;
         }
     }];
     
+}
+
+- (void)nemoHeadContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *error))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure
+{
+    
+    NSLog(@"Start HEADing %@", containerName);
+    
+    NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
+    
+    AFHTTPRequestSerializer *reqSerializer = [[AFHTTPRequestSerializer alloc] init];
+    [self setRequestSerializer:reqSerializer];
+    
+    AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
+    [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
+    [self setResponseSerializer:resSerializer];
+    if (self.authenticated) {
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+    }
+    AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
+    [self setResponseSerializer:jsonSerializer];
+    
+    NSString *headURLString = [[self.storageUrl stringByAppendingString:@"/"] stringByAppendingString:containerName];
+    
+    
+    NSLog(@"head URL: %@", headURLString);
+    
+    task = [self HEAD:headURLString parameters:@{@"format":@"json"} success:^(NSURLSessionDataTask *task) {
+        
+        NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
+        NSLog(@"HEAD %@", containerName);
+        NSLog(@"header: %@", header);
+        for (NemoContainer *con in self.containerList) {
+            if ([con.containerName isEqualToString:containerName]) {
+                [con setMetaData:header];
+            }
+        }
+        if (success) {
+            success(containerName, nil);
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HEAD Container" object:nil];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        if (failure) {
+            failure(task, error);
+        }
+    }];
+    
+    [task resume];
 }
 
 #pragma mark -

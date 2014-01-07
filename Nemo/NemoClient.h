@@ -56,7 +56,25 @@
  *  @param successHandler executes if successful
  *  @param failureHandler exectues if failed
  */
-- (void)nemoGetAccount:(void (^)(NSArray *containers, NSError *jsonError))success failure:(void(^)(NSURLSessionDataTask *, NSError *error))failure ;
+- (void)nemoGetAccount:(void (^)(NSArray *containers, NSError *jsonError))success failure:(void (^)(NSURLSessionDataTask *task, NSError *error))failure ;
+
+/** Get container meta data in the container
+ *  @param successHandler executes if successful
+ *  @param failureHandler executes if failed
+ */
+- (void)nemoHeadContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
+
+/** Get container data in the container
+ *  @param successHandler executes if successful
+ *  @param failureHandler executes if failed
+ */
+- (void)nemoGetContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
+
+/** Delete container of the specified container name
+ *  @param successHandler executes if successful
+ *  @param failureHandler executes if failed
+ */
+- (void)nemoDeleteContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
 /*
 
 - (void)nemoPutPath:(NSString *)path container:(NSString *)con object:(NSString *)obj;

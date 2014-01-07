@@ -13,13 +13,12 @@
 #pragma mark - Properties
 
 @property (nonatomic, retain) NSString *containerName;
-@property (nonatomic, retain) NSDate *createTimeStamp;
-@property (nonatomic, retain) NSArray *metaData;
+@property (nonatomic, retain) NSDictionary *metaData;
 
 
 #pragma mark - Initializer
 
-- (id)initWithContainerName:(NSString *)name createAt:(NSDate *)timeStamp metaData:(NSArray *)meta;
+- (id)initWithContainerName:(NSString *)name withMetaData:(NSDictionary *)meta;
 - (id)init;
 
 @end

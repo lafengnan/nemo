@@ -11,7 +11,7 @@
 @class NemoContainer;
 @interface NemoContainerDetailViewController : UIViewController
 
-@property (weak, nonatomic) IBOutlet UILabel *containerName;
+@property (weak, nonatomic) IBOutlet UILabel *bytesUsed;
 
 @property (weak, nonatomic) IBOutlet UILabel *objectCount;
 @property (weak, nonatomic) IBOutlet UILabel *createTimeStamp;

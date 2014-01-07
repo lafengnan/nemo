@@ -10,18 +10,17 @@
 
 @implementation NemoContainer
 
-@synthesize containerName, createTimeStamp, metaData;
+@synthesize containerName, metaData;
 
 - (id)init
 {
-    return [self initWithContainerName:nil createAt:nil metaData:nil];
+    return [self initWithContainerName:nil withMetaData:nil];
 }
 
-- (id)initWithContainerName:(NSString *)name createAt:(NSDate *)timeStamp metaData:(NSArray *)meta
+- (id)initWithContainerName:(NSString *)name withMetaData:(NSDictionary *)meta
 {
     if (self = [super init]) {
         [self setContainerName:name];
-        [self setCreateTimeStamp:timeStamp];
         [self setMetaData:meta];
     }
     
