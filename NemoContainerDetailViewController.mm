@@ -9,6 +9,7 @@
 #import "NemoContainerDetailViewController.h"
 #import "NemoContainer.h"
 #import "NemoClient.h"
+#import "QREncoder.h"
 
 #define KB (2ll << 10)
 #define MB (2ll << 20)
@@ -20,7 +21,7 @@
 @end
 
 @implementation NemoContainerDetailViewController
-@synthesize bytesUsed, createTimeStamp, objectCount, containerImage, container;
+@synthesize bytesUsed, createTimeStamp, objectCount, qrcodeImageView, container;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -31,11 +32,12 @@
     return self;
 }
 
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
-    NSLog(@"view will appear");
+    NMLog(@"view will appear");
     
     NemoClient *client = [NemoClient getClient];
     
@@ -51,7 +53,7 @@
         [self.objectCount setText:container.metaData[@"X-Container-Object-Count"]];
         
         
-        NSString *bytesUsedUnit = @" B";
+        NSString *bytesUsedUnit = @" Bytes";
         NSInteger bytes = [self.container.metaData[@"X-Container-Bytes-Used"] integerValue];
         
         if ( bytes > KB && bytes < MB) {
@@ -79,6 +81,21 @@
         [self.bytesUsed setText:[NSString stringWithFormat:@"%ld %@", bytes, bytesUsedUnit]];
 
         [[self navigationItem] setTitle:self.container.containerName];
+        
+        // Add QR Code Image here
+        
+        UIImage *qrcodeImage = [self generateQRImageWithContainer:self.container.containerName
+                                                        bytesUsed:[self.bytesUsed text]
+                                                      objectCount:[self.objectCount text]
+                                                        createdAt:[self.createTimeStamp text]];
+        
+        CGRect qrcodeImageViewFrame = CGRectMake(35, 266, 125.0, 125.0);
+        
+        [qrcodeImageView setFrame:qrcodeImageViewFrame];
+        
+        [self.qrcodeImageView setImage:qrcodeImage];
+        
+        
         [self.view setNeedsDisplay];
     } failure:^(NSURLSessionTask *task, NSError *error) {
         ;
@@ -92,16 +109,36 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
-    /** After view loaded, app needs to update container meta data here
-     *  So controller will invoke nemoHeadContainer here to display the 
-     *  meta data of a specified container 
-     */
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Instance Methods
+
+/** Generate a QRCode Image by using containerName + bytesUsed + ObjectCount string
+ *  @param containerName the name of container
+ *  @param bytes the bytes-used value converted to NSString 
+ *  @param cnt the object-count value converted to NSString
+ */
+
+- (UIImage *)generateQRImageWithContainer:(NSString *)containerName bytesUsed:(NSString *)bytes objectCount:(NSString *)cnt createdAt:(NSString *)timestamp
+{
+    
+    // The qrcode is square, now we make it 250 pixels wide
+    int qrcodeImageDimension = 125;
+    
+    NSString *imageString = [NSString stringWithFormat:@"Container Name: %@\nUsed Space: %@\nObject Count: %@\nTimestamp: %@", containerName, bytes, cnt, timestamp];
+    NMLog(@"image string:%@", imageString);
+    DataMatrix *qrMatrix = [QREncoder encodeWithECLevel:QR_ECLEVEL_AUTO version:QR_VERSION_AUTO string:imageString];
+    
+    // Render the matrix
+    UIImage *qrcodeImage = [QREncoder renderDataMatrix:qrMatrix imageDimension:qrcodeImageDimension];
+    
+    return qrcodeImage;
 }
 
 @end

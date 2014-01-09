@@ -113,18 +113,18 @@ static id client = nil;
         
             void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
             {
-                NSLog(@"Get Token Successful from %@", [self.authUrl absoluteString]);
-                NSLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
-                NSLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
-                NSLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
-                NSLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
-                NSLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
-                NSLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+                NMLog(@"Get Token Successful from %@", [self.authUrl absoluteString]);
+                NMLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
+                NMLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
+                NMLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
+                NMLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
+                NMLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
+                NMLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
                 
-                NSLog(@"response--->%@", [task response]);
-                NSLog(@"account: %@", [[[self storageUrl] componentsSeparatedByString:@"/"] lastObject]);
-                NSLog(@"X-Auth-Token: %@", [self authToken]);
-                NSLog(@"X-Storage-Url: %@", [self storageUrl]);
+                NMLog(@"response--->%@", [task response]);
+                NMLog(@"account: %@", [[[self storageUrl] componentsSeparatedByString:@"/"] lastObject]);
+                NMLog(@"X-Auth-Token: %@", [self authToken]);
+                NMLog(@"X-Storage-Url: %@", [self storageUrl]);
             };
             
             displayTask(task);
@@ -134,9 +134,9 @@ static id client = nil;
         [self setResponse:(NSHTTPURLResponse *)[task response]];
         void (^displayErrorResponse)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
         {
-            NSLog(@"Get Token Failed from %@", [self.authUrl absoluteString]);
-            NSLog(@"response--->%@", [task response]);
-            NSLog(@"error: %@", error);
+            NMLog(@"Get Token Failed from %@", [self.authUrl absoluteString]);
+            NMLog(@"response--->%@", [task response]);
+            NMLog(@"error: %@", error);
         };
         
         displayErrorResponse(task);
@@ -178,14 +178,14 @@ static id client = nil;
             NemoContainer *container = [[NemoContainer alloc] initWithContainerName:con[@"name"] withMetaData:nil];
             [self.containerList addObject:container];
         }
-//        NSLog(@"response: %@", [task response]);
-//        NSLog(@"resopnseObject: %@", responseObject);
+//        NMLog(@"response: %@", [task response]);
+//        NMLog(@"resopnseObject: %@", responseObject);
         if (successHandler) {
             successHandler(self.containerList, nil);
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"error: %@", error);
+        NMLog(@"error: %@", error);
         if (failureHandler) {
             failureHandler(task, nil);
         }
@@ -196,7 +196,7 @@ static id client = nil;
 - (void)nemoHeadContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *error))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure
 {
     
-    NSLog(@"Start HEADing %@", containerName);
+    NMLog(@"Start HEADing %@", containerName);
     
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
@@ -215,13 +215,13 @@ static id client = nil;
     NSString *headURLString = [[self.storageUrl stringByAppendingString:@"/"] stringByAppendingString:containerName];
     
     
-    NSLog(@"head URL: %@", headURLString);
+    NMLog(@"head URL: %@", headURLString);
     
     task = [self HEAD:headURLString parameters:@{@"format":@"json"} success:^(NSURLSessionDataTask *task) {
         
         NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
-        NSLog(@"HEAD %@", containerName);
-        NSLog(@"header: %@", header);
+        NMLog(@"HEAD %@", containerName);
+        NMLog(@"header: %@", header);
         for (NemoContainer *con in self.containerList) {
             if ([con.containerName isEqualToString:containerName]) {
                 [con setMetaData:header];
@@ -245,14 +245,14 @@ static id client = nil;
 - (void)displayClientInfo
 {
     if (self == [NemoClient getClient]) {
-        NSLog(@"Client Info:");
-        NSLog(@"User Name: %@", self.userName);
-        NSLog(@"Password:  %@", self.passWord);
-        NSLog(@"authenticated?: %d", self.authenticated);
-        NSLog(@"auth url: %@", [self.authUrl absoluteString]);
-        NSLog(@"auth token: %@", self.authToken);
-        NSLog(@"storage url: %@", self.storageUrl);
-        NSLog(@"containers: %@", self.containerList);
+        NMLog(@"Client Info:");
+        NMLog(@"User Name: %@", self.userName);
+        NMLog(@"Password:  %@", self.passWord);
+        NMLog(@"authenticated?: %d", self.authenticated);
+        NMLog(@"auth url: %@", [self.authUrl absoluteString]);
+        NMLog(@"auth token: %@", self.authToken);
+        NMLog(@"storage url: %@", self.storageUrl);
+        NMLog(@"containers: %@", self.containerList);
     }
 }
 

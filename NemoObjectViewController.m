@@ -10,6 +10,8 @@
 
 @implementation NemoObjectViewController
 
+@synthesize myWebView;
+
 - (id)init
 {
     self = [super initWithNibName:nil bundle:nil];
@@ -26,7 +28,26 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [[self view] setBackgroundColor:[UIColor blueColor]];
+    
+    NSURL *scriptogrURL = [NSURL URLWithString:@"http://www.flickr.com/photos/lafengnan"];
+    NSURLRequest *req = [NSURLRequest requestWithURL:scriptogrURL];
+    
+    [self.myWebView loadRequest:req];
+    
+}
+
+- (void)loadView
+{
+    CGRect screenFrame = [[UIScreen mainScreen] applicationFrame];
+    UIWebView *wv = [[UIWebView alloc] initWithFrame:screenFrame];
+    [wv setScalesPageToFit:YES];
+    
+    [self setView:wv];
+}
+
+- (UIWebView *)myWebView
+{
+    return (UIWebView *)[self view];
 }
 
 

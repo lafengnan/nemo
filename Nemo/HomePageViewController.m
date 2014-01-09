@@ -40,7 +40,7 @@
 - (IBAction)doLogin:(id)sender
 {
     
-    NSLog(@"doLogin");
+    NMLog(@"doLogin");
     [NemoClient initialize];
     NemoClient *client = [NemoClient getClient];
     [client setUserName:[userName text]];
@@ -73,6 +73,7 @@
                     
                     NemoContainerViewController *containerVc = [[NemoContainerViewController alloc] init];
                     NemoObjectViewController *objectVc = [[NemoObjectViewController alloc] init];
+                    
                     UIViewController *settingVc = [[UIViewController alloc] init];
                     [[settingVc view] setBackgroundColor:[UIColor brownColor]];
                     [[settingVc tabBarItem] setTitle:@"Setting"];
@@ -80,10 +81,15 @@
                     UINavigationController *containerNav = [[UINavigationController alloc] initWithRootViewController:containerVc];
                     [containerNav setTitle:@"Container List"];
                     
-                    NSArray *viewControllers = [NSArray arrayWithObjects:containerNav, objectVc, settingVc, nil];
+                    UINavigationController *objNav = [[UINavigationController alloc] initWithRootViewController:objectVc];
+                    UINavigationController *setNav = [[UINavigationController alloc] initWithRootViewController:settingVc];
+                    
+                    NSArray *viewControllers = [NSArray arrayWithObjects:containerNav, objNav, setNav, nil];
                     
                     [tabBarController setViewControllers:viewControllers];
                     [self presentViewController:tabBarController animated:YES completion:^(){
+                        
+                        NMLog(@"tabBar view controller loaded");
                         
                     }];
                 }
@@ -173,7 +179,7 @@
 //    frame.origin.y +=120;
 //    frame.size.height -=120;
 //    self.view.frame = frame;
-    NSLog(@"textfield:%@", textField);
+    NMLog(@"textfield:%@", textField);
     //返回一个BOOL值，指明是否允许在按下回车键时结束编辑
     //如果允许要调用resignFirstResponder 方法，这回导致结束编辑，而键盘会被收起
     [textField resignFirstResponder];//查一下resign这个单词的意思就明白这个方法了

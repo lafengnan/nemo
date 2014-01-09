@@ -41,7 +41,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-     NSLog(@"table view did load");
+     NMLog(@"table view did load");
     // 1. Get client instance
     NemoClient *client = [NemoClient getClient];
     //[client displayClientInfo];
@@ -55,8 +55,8 @@
             /* Do HEAD operation here to display cell detail lable */
             for (NemoContainer *con in self.containerList) {
                 [client nemoHeadContainer:con.containerName success:^(NSString *containerName, NSError *jsonError) {
-                    NSLog(@"container: %@", containerName);
-                    NSLog(@"tableviw did load--->HEAD: %@", con.metaData);
+                    NMLog(@"container: %@", containerName);
+                    NMLog(@"tableviw did load--->HEAD: %@", con.metaData);
                     [self.tableView reloadData];
                     
                 } failure:^(NSURLSessionTask *task, NSError *error) {
@@ -69,19 +69,19 @@
             
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
             
-            NSLog(@"error %@", error);
+            NMLog(@"error %@", error);
             void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
             {
-                NSLog(@"Get Token Successful from %@", client.storageUrl);
-                NSLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
-                NSLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
-                NSLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
-                NSLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
-                NSLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
-                NSLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+                NMLog(@"Get Token Successful from %@", client.storageUrl);
+                NMLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
+                NMLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
+                NMLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
+                NMLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
+                NMLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
+                NMLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
                 
-                NSLog(@"response--->%@", [task response]);
-                NSLog(@"account: %@", [[[client storageUrl] componentsSeparatedByString:@"/"] lastObject]);
+                NMLog(@"response--->%@", [task response]);
+                NMLog(@"account: %@", [[[client storageUrl] componentsSeparatedByString:@"/"] lastObject]);
             };
             
             displayTask(task);
@@ -106,7 +106,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSLog(@"display %u lines", (unsigned int)[self.containerList count]);
+    NMLog(@"display %u lines", (unsigned int)[self.containerList count]);
     return [self.containerList count];
 }
 
@@ -208,22 +208,22 @@
             }];
         }
 
-        [[self tableView] reloadData];
+//        [[self tableView] reloadData];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         
-        NSLog(@"error %@", error);
+        NMLog(@"error %@", error);
         void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
         {
-            NSLog(@"Get Token Successful from %@", client.storageUrl);
-            NSLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
-            NSLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
-            NSLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
-            NSLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
-            NSLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
-            NSLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+            NMLog(@"Get Token Successful from %@", client.storageUrl);
+            NMLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
+            NMLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
+            NMLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
+            NMLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
+            NMLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
+            NMLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
             
-            NSLog(@"response--->%@", [task response]);
-            NSLog(@"account: %@", [[[client storageUrl] componentsSeparatedByString:@"/"] lastObject]);
+            NMLog(@"response--->%@", [task response]);
+            NMLog(@"account: %@", [[[client storageUrl] componentsSeparatedByString:@"/"] lastObject]);
         };
         
         displayTask(task);

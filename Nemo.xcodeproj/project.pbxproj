@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		89CF122E42C54E1FBEF344E2 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB54B1D90977443B80A84621 /* libPods.a */; };
 		8F02C193187AC0CD00F0A92A /* container_64.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C192187AC0CD00F0A92A /* container_64.png */; };
 		8F02C195187AC16A00F0A92A /* container_32.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C194187AC16A00F0A92A /* container_32.png */; };
 		8F02C197187AC2E200F0A92A /* container_item_64.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C196187AC2E200F0A92A /* container_item_64.png */; };
 		8F02C199187AC36B00F0A92A /* container_item_32.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C198187AC36B00F0A92A /* container_item_32.png */; };
 		8F02C19B187AD13100F0A92A /* object_32.png in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C19A187AD13100F0A92A /* object_32.png */; };
-		8F02C19F187AD9DA00F0A92A /* NemoContainerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.m */; };
+		8F02C19F187AD9DA00F0A92A /* NemoContainerDetailViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.mm */; };
 		8F02C1A0187AD9DA00F0A92A /* NemoContainerDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8F02C19E187AD9DA00F0A92A /* NemoContainerDetailViewController.xib */; };
 		8F0BC175187B0DCA0038C96E /* NemoContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F0BC174187B0DCA0038C96E /* NemoContainer.m */; };
 		8F51967F1861E70E00D997F3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F51967E1861E70E00D997F3 /* Foundation.framework */; };
@@ -88,7 +89,7 @@
 		8F02C198187AC36B00F0A92A /* container_item_32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container_item_32.png; sourceTree = "<group>"; };
 		8F02C19A187AD13100F0A92A /* object_32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = object_32.png; sourceTree = "<group>"; };
 		8F02C19C187AD9DA00F0A92A /* NemoContainerDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoContainerDetailViewController.h; sourceTree = "<group>"; };
-		8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoContainerDetailViewController.m; sourceTree = "<group>"; };
+		8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NemoContainerDetailViewController.mm; sourceTree = "<group>"; };
 		8F02C19E187AD9DA00F0A92A /* NemoContainerDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NemoContainerDetailViewController.xib; sourceTree = "<group>"; };
 		8F0BC173187B0DCA0038C96E /* NemoContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoContainer.h; sourceTree = "<group>"; };
 		8F0BC174187B0DCA0038C96E /* NemoContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoContainer.m; sourceTree = "<group>"; };
@@ -125,6 +126,8 @@
 		8F959E4618634CBE0096CED8 /* NemoContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoContainerViewController.m; sourceTree = "<group>"; };
 		8F959E4818634D250096CED8 /* NemoObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoObjectViewController.h; sourceTree = "<group>"; };
 		8F959E4918634D250096CED8 /* NemoObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoObjectViewController.m; sourceTree = "<group>"; };
+		8FA1CDEC187EC0AD000884EA /* libc++.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.1.dylib"; path = "usr/lib/libc++.1.dylib"; sourceTree = SDKROOT; };
+		8FA1CDEE187EC0D1000884EA /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		8FA8B7AE1879A2F6003EF3FD /* EGORefreshTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EGORefreshTableHeaderView.h; sourceTree = "<group>"; };
 		8FA8B7AF1879A2F6003EF3FD /* EGORefreshTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EGORefreshTableHeaderView.m; sourceTree = "<group>"; };
 		8FA8B7B21879A3BE003EF3FD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -173,6 +176,8 @@
 		8FE6DAB8186DE2F8003E7EC0 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		8FE6DABA186DE34F003E7EC0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		8FE6DABC186DE53E003E7EC0 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		AB54B1D90977443B80A84621 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C34454302D164301B691B9DE /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +192,7 @@
 				8F5196811861E70E00D997F3 /* CoreGraphics.framework in Frameworks */,
 				8F5196831861E70E00D997F3 /* UIKit.framework in Frameworks */,
 				8F51967F1861E70E00D997F3 /* Foundation.framework in Frameworks */,
+				89CF122E42C54E1FBEF344E2 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,6 +217,7 @@
 				8F51967D1861E70E00D997F3 /* Frameworks */,
 				8F51969D1861E70E00D997F3 /* NemoTests */,
 				8F51967C1861E70E00D997F3 /* Products */,
+				C34454302D164301B691B9DE /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -226,6 +233,8 @@
 		8F51967D1861E70E00D997F3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8FA1CDEE187EC0D1000884EA /* libstdc++.dylib */,
+				8FA1CDEC187EC0AD000884EA /* libc++.1.dylib */,
 				8FA8B7B21879A3BE003EF3FD /* QuartzCore.framework */,
 				8FE6DABC186DE53E003E7EC0 /* MobileCoreServices.framework */,
 				8FE6DABA186DE34F003E7EC0 /* SystemConfiguration.framework */,
@@ -234,6 +243,7 @@
 				8F5196801861E70E00D997F3 /* CoreGraphics.framework */,
 				8F5196821861E70E00D997F3 /* UIKit.framework */,
 				8F5196971861E70E00D997F3 /* XCTest.framework */,
+				AB54B1D90977443B80A84621 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -299,7 +309,7 @@
 				8F959E4518634CBE0096CED8 /* NemoContainerViewController.h */,
 				8F959E4618634CBE0096CED8 /* NemoContainerViewController.m */,
 				8F02C19C187AD9DA00F0A92A /* NemoContainerDetailViewController.h */,
-				8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.m */,
+				8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.mm */,
 				8F02C19E187AD9DA00F0A92A /* NemoContainerDetailViewController.xib */,
 				8F959E4818634D250096CED8 /* NemoObjectViewController.h */,
 				8F959E4918634D250096CED8 /* NemoObjectViewController.m */,
@@ -412,9 +422,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8F5196A71861E70E00D997F3 /* Build configuration list for PBXNativeTarget "Nemo" */;
 			buildPhases = (
+				B9A2917DEACB4E72A0DBAD75 /* Check Pods Manifest.lock */,
 				8F5196771861E70E00D997F3 /* Sources */,
 				8F5196781861E70E00D997F3 /* Frameworks */,
 				8F5196791861E70E00D997F3 /* Resources */,
+				4A57C74A73A24ABF8C542FE5 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -519,6 +531,39 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		4A57C74A73A24ABF8C542FE5 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B9A2917DEACB4E72A0DBAD75 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		8F5196771861E70E00D997F3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -535,7 +580,7 @@
 				8F9553F418671FCA00F432CF /* NemoClient.m in Sources */,
 				8FE6DAB2186DBD44003E7EC0 /* UIActivityIndicatorView+AFNetworking.m in Sources */,
 				8FE6DA9D186DBCDF003E7EC0 /* AFURLRequestSerialization.m in Sources */,
-				8F02C19F187AD9DA00F0A92A /* NemoContainerDetailViewController.m in Sources */,
+				8F02C19F187AD9DA00F0A92A /* NemoContainerDetailViewController.mm in Sources */,
 				8FE6DAB1186DBD44003E7EC0 /* AFNetworkActivityIndicatorManager.m in Sources */,
 				8FE6DA9B186DBCDF003E7EC0 /* AFSecurityPolicy.m in Sources */,
 				8FE6DA97186DBCDF003E7EC0 /* AFHTTPRequestOperation.m in Sources */,
@@ -664,6 +709,7 @@
 		};
 		8F5196A81861E70E00D997F3 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C34454302D164301B691B9DE /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -676,6 +722,7 @@
 		};
 		8F5196A91861E70E00D997F3 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C34454302D164301B691B9DE /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

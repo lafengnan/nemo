@@ -15,7 +15,13 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *objectCount;
 @property (weak, nonatomic) IBOutlet UILabel *createTimeStamp;
-@property (weak, nonatomic) IBOutlet UIImageView *containerImage;
+@property (weak, nonatomic) IBOutlet UIImageView *qrcodeImageView;
 
 @property (retain, nonatomic) NemoContainer *container;
+
+- (UIImage *)generateQRImageWithContainer:(NSString *)containerName
+                                bytesUsed:(NSString *)bytes
+                              objectCount:(NSString *)cnt
+                                createdAt:(NSString *)timestamp;
+
 @end

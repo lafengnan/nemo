@@ -19,8 +19,6 @@
 
 
 - (id)initWithContainerList:(NSArray *)containers;
-//- (void)reloadTableViewDataSource;
-//- (void)doneLoadingTableViewData;
 - (void)updateContainerList;
 - (void)doneUpdatingContainerList;
 

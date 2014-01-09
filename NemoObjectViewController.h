@@ -10,4 +10,6 @@
 
 @interface NemoObjectViewController : UIViewController
 
+@property (nonatomic, readonly) UIWebView *myWebView;
+
 @end
