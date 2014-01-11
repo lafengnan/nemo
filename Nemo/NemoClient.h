@@ -53,7 +53,7 @@
 
 #pragma mark - Http Operations
 
-- (void)setHttpHeader:(NSDictionary *)headerDict;
+- (void)setHttpHeader:(NSDictionary *)headerDict withRequestSerializer:(AFHTTPRequestSerializer *)serial;
 
 /** Get container list in the account
  *  @param successHandler executes if successful

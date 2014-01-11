@@ -7,9 +7,12 @@
 //
 
 #import "NemoContainerViewController.h"
-#import "NemoClient.h"
 #import "NemoContainerDetailViewController.h"
+#import "NemoNewContainerViewController.h"
+
+#import "NemoClient.h"
 #import "NemoContainer.h"
+
 
 @implementation NemoContainerViewController
 @synthesize containerList;
@@ -34,12 +37,18 @@
         // Set UINavigationItem
         UIBarButtonItem *bbi = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                              target:self
-                                                                             action:@selector(addNewContainer:success:failure:)];
+                                                                             action:@selector(addNewContainer:)];
         [[self navigationItem] setTitle:@"My Containers"];
         [[self navigationItem] setRightBarButtonItem:bbi animated:YES];
     }
     
     return self;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [[self tableView] reloadData];
 }
 
 - (void)viewDidLoad
@@ -215,24 +224,12 @@
 
 #pragma mark -  Data Source Methods
 
-- (void)addNewContainer:(NemoContainer *)con success:(void (^)())successHandler failure:(void (^)())failureHandler
+- (IBAction)addNewContainer:(id)sender
 {
-    NemoClient *client = [NemoClient getClient];
-    if (client) {
-        [client nemoPutContainer:con success:^(NemoContainer *newContainer, NSError *error) {
-            NMLog(@"Debug: %@ PUT successfully!", newContainer.containerName);
-            if (successHandler) {
-                successHandler();
-            }
-        } failure:^(NSURLSessionTask *task, NSError *error) {
-            NMLog(@"Debug: %@ PUT Failed", con.containerName);
-            NMLog(@"Debug: Error: %@", error.localizedDescription);
-            if (failureHandler) {
-                failureHandler();
-            }
-        }];
-    }
+    NemoNewContainerViewController *newVc = [[NemoNewContainerViewController alloc] init];
+    [self.navigationController pushViewController:newVc animated:YES];
 }
+
 
 - (void)updateContainerList
 {

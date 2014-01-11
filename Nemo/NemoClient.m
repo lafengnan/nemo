@@ -57,14 +57,21 @@ static id client = nil;
 }
 
 
-- (void)setHttpHeader:(NSDictionary *)headerDict
+- (void)setHttpHeader:(NSDictionary *)headerDict withRequestSerializer:(AFHTTPRequestSerializer *)serial
 {
-    AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-    if (serializer) {
+    if (!serial) {
+        AFHTTPRequestSerializer *newSerial = [[AFHTTPRequestSerializer alloc] init];
+        [self setRequestSerializer:newSerial];
+    }
+    else
+    {
+        [self setRequestSerializer:serial];
+    }
+    if (self.requestSerializer) {
         for (NSString *key in headerDict) {
-            [serializer setValue:[headerDict objectForKey:key] forHTTPHeaderField:key];
+            NMLog(@"Debug: Key----value: %@-----%@", key, headerDict[key]);
+            [self.requestSerializer setValue:[headerDict objectForKey:key] forHTTPHeaderField:key];
         }
-        [self setRequestSerializer:serializer];
     }
 }
 
@@ -86,7 +93,7 @@ static id client = nil;
 {
     
     // 1. Set header
-    [self setHttpHeader:@{@"X-Storage-User":self.userName, @"X-Storage-Pass":self.passWord}] ;
+    [self setHttpHeader:@{@"X-Storage-User":self.userName, @"X-Storage-Pass":self.passWord} withRequestSerializer:nil] ;
     
     // Set authentication url to: http://192.168.1.106:8080/auth/v1.0
     self.authUrl = [NSURL URLWithString:@"auth/v1.0" relativeToURL:self.baseURL];
@@ -174,7 +181,7 @@ static id client = nil;
     [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
     [self setResponseSerializer:resSerializer];
     if (self.authenticated) {
-        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken} withRequestSerializer:nil];
     }
     
     AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
@@ -219,8 +226,9 @@ static id client = nil;
     AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
     [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
     [self setResponseSerializer:resSerializer];
+    
     if (self.authenticated) {
-        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken} withRequestSerializer:nil];
     }
     AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
     [self setResponseSerializer:jsonSerializer];
@@ -263,8 +271,14 @@ static id client = nil;
     AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
     [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
     [self setResponseSerializer:resSerializer];
+    
     if (self.authenticated) {
-        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken} withRequestSerializer:nil];
+        if (newContainer.metaData) {
+            NMLog(@"Debug --- meta data: %@", newContainer.metaData);
+            [self setHttpHeader:newContainer.metaData withRequestSerializer:self.requestSerializer];
+            NMLog(@"Header: %@", [[self requestSerializer] HTTPRequestHeaders]);
+        }
     }
     
     AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
@@ -275,13 +289,16 @@ static id client = nil;
      * So need to generate the URL by adding new container
      * name to the tail of storage URL
      */
-    NSString *putURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl,newContainer.containerName];
+    NSString *putURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, newContainer.containerName];
 
     task = [self PUT:putURLString parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        
         NMLog(@"Debug: PUT Container %@", newContainer.containerName);
+        NMLog(@"Debug: PUT Task Description: %@",[task description]);
         NMLog(@"Debug: Response--->%@", [task response]);
         NMLog(@"Debug: Response Object: %@", responseObject);
+        if (successHandler) {
+            successHandler(newContainer, nil);
+        }
         ;
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         ;
@@ -305,7 +322,7 @@ static id client = nil;
     [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
     [self setResponseSerializer:resSerializer];
     if (self.authenticated) {
-        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken} withRequestSerializer:nil];
     }
     AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
     [self setResponseSerializer:jsonSerializer];
