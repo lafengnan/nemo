@@ -51,7 +51,6 @@ void (^authSuccessed)(UIViewController *hp) = ^(UIViewController *hp){
     [[settingVc tabBarItem] setTitle:@"Setting"];
     
     UINavigationController *containerNav = [[UINavigationController alloc] initWithRootViewController:containerVc];
-    [containerNav setTitle:@"Container List"];
     
     UINavigationController *objNav = [[UINavigationController alloc] initWithRootViewController:objectVc];
     UINavigationController *setNav = [[UINavigationController alloc] initWithRootViewController:settingVc];

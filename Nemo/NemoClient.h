@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+@class NemoContainer;
 
 @interface NemoClient : AFHTTPSessionManager
 
@@ -72,7 +73,15 @@
  */
 - (void)nemoGetContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
 
+/** Put a new container into the account
+ *  @param newContainer the container to add
+ *  @param successHandler executes if successful
+ *  @param failureHandler executes if failed
+ */
+- (void)nemoPutContainer:(NemoContainer *)newContainer success:(void (^)(NemoContainer *newContainer, NSError *error))successHandler failure:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
+
 /** Delete container of the specified container name
+ *  @param containerName the container name of the container to delete
  *  @param successHandler executes if successful
  *  @param failureHandler executes if failed
  */

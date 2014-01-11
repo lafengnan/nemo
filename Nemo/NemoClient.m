@@ -108,18 +108,18 @@ static id client = nil;
         
         void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
         {
-            NMLog(@"Get Token Successful from %@", [self.authUrl absoluteString]);
-            NMLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
-            NMLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
-            NMLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
-            NMLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
-            NMLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
-            NMLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+            NMLog(@"Debug Get Token Successful from %@", [self.authUrl absoluteString]);
+            NMLog(@"Debug countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
+            NMLog(@"Debug countOfBytesReceived: %lld", [task countOfBytesReceived]);
+            NMLog(@"Debug countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
+            NMLog(@"Debug countOfBytesSent: %lld", [task countOfBytesSent]);
+            NMLog(@"Debug request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
+            NMLog(@"Debug request--->method: %@", [[task currentRequest] HTTPMethod]);
             
-            NMLog(@"response--->%@", [task response]);
-            NMLog(@"account: %@", [[[self storageUrl] componentsSeparatedByString:@"/"] lastObject]);
-            NMLog(@"X-Auth-Token: %@", [self authToken]);
-            NMLog(@"X-Storage-Url: %@", [self storageUrl]);
+            NMLog(@"Debug response--->%@", [task response]);
+            NMLog(@"Debug account: %@", [[[self storageUrl] componentsSeparatedByString:@"/"] lastObject]);
+            NMLog(@"Debug X-Auth-Token: %@", [self authToken]);
+            NMLog(@"Debug X-Storage-Url: %@", [self storageUrl]);
         };
         
         /* Display Debug Info */
@@ -143,12 +143,12 @@ static id client = nil;
         {
             
             /* NMLog display Debug info */
-            NMLog(@"Get Token Failed from %@", [self.authUrl absoluteString]);
-            NMLog(@"response--->%@", [task response]);
-            NMLog(@"error:");
-            NMLog(@"Error Domain: %@", [error domain]);
-            NMLog(@"Error Code: %ld", (long)[error code]);
-            NMLog(@"User Info: %@", [error userInfo]);
+            NMLog(@"Debug Get Token Failed from %@", [self.authUrl absoluteString]);
+            NMLog(@"Debug response--->%@", [task response]);
+            NMLog(@"Debug error:");
+            NMLog(@"Debug Error Domain: %@", [error domain]);
+            NMLog(@"Debug Error Code: %ld", (long)[error code]);
+            NMLog(@"Debug User Info: %@", [error userInfo]);
             
             /* Update UI by invoking handler*/
             if (fail) {
@@ -191,14 +191,14 @@ static id client = nil;
             NemoContainer *container = [[NemoContainer alloc] initWithContainerName:con[@"name"] withMetaData:nil];
             [self.containerList addObject:container];
         }
-        NMLog(@"response: %@", [task response]);
-        NMLog(@"resopnseObject: %@", responseObject);
+        NMLog(@"Debug response: %@", [task response]);
+        NMLog(@"Debug resopnseObject: %@", responseObject);
         if (successHandler) {
             successHandler(self.containerList, nil);
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        NMLog(@"error: %@", error);
+        NMLog(@"Debug error: %@", error);
         if (failureHandler) {
             failureHandler(task, nil);
         }
@@ -209,7 +209,7 @@ static id client = nil;
 - (void)nemoHeadContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *error))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure
 {
     
-    NMLog(@"Start HEADing %@", containerName);
+    NMLog(@"Debug HEAD Container: %@", containerName);
     
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
@@ -225,16 +225,16 @@ static id client = nil;
     AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
     [self setResponseSerializer:jsonSerializer];
     
-    NSString *headURLString = [[self.storageUrl stringByAppendingString:@"/"] stringByAppendingString:containerName];
+    NSString *headURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, containerName];
     
     
-    NMLog(@"head URL: %@", headURLString);
+    NMLog(@"Debug head URL: %@", headURLString);
     
     task = [self HEAD:headURLString parameters:@{@"format":@"json"} success:^(NSURLSessionDataTask *task) {
         
         NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
-        NMLog(@"HEAD %@", containerName);
-        NMLog(@"header: %@", header);
+        NMLog(@"Debug HEAD %@", containerName);
+        NMLog(@"Debug header: %@", header);
         for (NemoContainer *con in self.containerList) {
             if ([con.containerName isEqualToString:containerName]) {
                 [con setMetaData:header];
@@ -253,19 +253,115 @@ static id client = nil;
     [task resume];
 }
 
+- (void)nemoPutContainer:(NemoContainer *)newContainer success:(void (^)(NemoContainer *, NSError *))successHandler failure:(void (^)(NSURLSessionTask *, NSError *))failureHandler
+{
+    NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
+    
+    AFHTTPRequestSerializer *reqSerializer = [[AFHTTPRequestSerializer alloc] init];
+    [self setRequestSerializer:reqSerializer];
+    
+    AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
+    [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
+    [self setResponseSerializer:resSerializer];
+    if (self.authenticated) {
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+    }
+    
+    AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
+    [self setResponseSerializer:jsonSerializer];
+    
+    /* Swift PUT Container API is: 
+     * PUT http://host:port/v1/account/container
+     * So need to generate the URL by adding new container
+     * name to the tail of storage URL
+     */
+    NSString *putURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl,newContainer.containerName];
+
+    task = [self PUT:putURLString parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        NMLog(@"Debug: PUT Container %@", newContainer.containerName);
+        NMLog(@"Debug: Response--->%@", [task response]);
+        NMLog(@"Debug: Response Object: %@", responseObject);
+        ;
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        ;
+    }];
+    
+    
+    
+    
+}
+
+- (void)nemoDeleteContainer:(NSString *)containerName success:(void (^)(NSString *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
+{
+    NMLog(@"Debug Delete container: %@", containerName);
+    
+    NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
+    
+    AFHTTPRequestSerializer *reqSerializer = [[AFHTTPRequestSerializer alloc] init];
+    [self setRequestSerializer:reqSerializer];
+    
+    AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
+    [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
+    [self setResponseSerializer:resSerializer];
+    if (self.authenticated) {
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+    }
+    AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
+    [self setResponseSerializer:jsonSerializer];
+    
+    NSString *deleteURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, containerName];
+    
+    task = [self DELETE:deleteURLString parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        NMLog(@"Debug: Delete container: %@ Successfully!", containerName);
+        NMLog(@"Debug: response: %@", [task response]);
+        NMLog(@"Debug: response Obj: %@", responseObject);
+        
+        if (success) {
+            success(containerName, nil);
+        }
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        
+        NMLog(@"Debug: Delete container: %@ Failed!", containerName);
+        NMLog(@"Debug: response: %@", [task response]);
+        NMLog(@"Debug: error: %@", error);
+        
+        /* Container could not be deleted if it has objects 
+         * status code 409 returned if delete an nonempty container
+         */
+        if ([(NSHTTPURLResponse *)[task response] statusCode] == 409) {
+            NMLog(@"Debug: Conflict happens while deleting %@", containerName);
+            NSString *msg = [NSString stringWithFormat:@"%@ is not empty, Deletion is forbidden!", containerName];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Failed!" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }
+        
+        if (failure) {
+            
+            failure(task, error);
+        }
+        
+    }];
+    
+    [task resume];
+    
+}
+
 #pragma mark -
 
 - (void)displayClientInfo
 {
     if (self == [NemoClient getClient]) {
-        NMLog(@"Client Info:");
-        NMLog(@"User Name: %@", self.userName);
-        NMLog(@"Password:  %@", self.passWord);
-        NMLog(@"authenticated?: %d", self.authenticated);
-        NMLog(@"auth url: %@", [self.authUrl absoluteString]);
-        NMLog(@"auth token: %@", self.authToken);
-        NMLog(@"storage url: %@", self.storageUrl);
-        NMLog(@"containers: %@", self.containerList);
+        NMLog(@"Debug Client Info:");
+        NMLog(@"Debug User Name: %@", self.userName);
+        NMLog(@"Debug Password:  %@", self.passWord);
+        NMLog(@"Debug authenticated?: %d", self.authenticated);
+        NMLog(@"Debug auth url: %@", [self.authUrl absoluteString]);
+        NMLog(@"Debug auth token: %@", self.authToken);
+        NMLog(@"Debug storage url: %@", self.storageUrl);
+        NMLog(@"Debug containers: %@", self.containerList);
     }
 }
 

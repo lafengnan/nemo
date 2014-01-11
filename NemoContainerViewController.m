@@ -32,7 +32,11 @@
         [tbi setImage:[UIImage imageNamed:@"container_item_32"]];
         self.containerList = [NSMutableArray arrayWithArray:containers];
         // Set UINavigationItem
+        UIBarButtonItem *bbi = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                                             target:self
+                                                                             action:@selector(addNewContainer:success:failure:)];
         [[self navigationItem] setTitle:@"My Containers"];
+        [[self navigationItem] setRightBarButtonItem:bbi animated:YES];
     }
     
     return self;
@@ -87,10 +91,7 @@
             displayTask(task);
         }];
 //    });
-    
-    
 
-    
     if (_refreshHeaderView == nil) {
         EGORefreshTableHeaderView *view1 =
         [[EGORefreshTableHeaderView alloc]initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height)];
@@ -157,10 +158,33 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
+    /* Get client and container which willbe edit */
+    __block NemoClient *client = [NemoClient getClient];
+    __block NemoContainer *container = self.containerList[indexPath.row];
+    
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [self.containerList removeObjectAtIndex:indexPath.row];
         
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        /* Send DELETE operation to Swift */
+        [client nemoDeleteContainer:container.containerName success:^(NSString *containerName, NSError *jsonError) {
+            
+            NMLog(@"Debug: Container: %@ has deleted!", containerName);
+            
+            /* Remove the container in container list and update UI */
+            [self.containerList removeObjectAtIndex:indexPath.row];
+            
+            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation: UITableViewRowAnimationFade];
+            ;
+        } failure:^(NSURLSessionTask *task, NSError *error) {
+            ;
+        }];
+        
+    }
+    if (editingStyle == UITableViewCellEditingStyleInsert) {
+        
+        NemoContainer *newContainer = [[NemoContainer alloc] initWithContainerName:@"new" withMetaData:nil];
+        [containerList addObject:newContainer];
+        [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
     
 }
@@ -187,7 +211,29 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-#pragma mark -  Data Source Loading/Reloading methods
+
+
+#pragma mark -  Data Source Methods
+
+- (void)addNewContainer:(NemoContainer *)con success:(void (^)())successHandler failure:(void (^)())failureHandler
+{
+    NemoClient *client = [NemoClient getClient];
+    if (client) {
+        [client nemoPutContainer:con success:^(NemoContainer *newContainer, NSError *error) {
+            NMLog(@"Debug: %@ PUT successfully!", newContainer.containerName);
+            if (successHandler) {
+                successHandler();
+            }
+        } failure:^(NSURLSessionTask *task, NSError *error) {
+            NMLog(@"Debug: %@ PUT Failed", con.containerName);
+            NMLog(@"Debug: Error: %@", error.localizedDescription);
+            if (failureHandler) {
+                failureHandler();
+            }
+        }];
+    }
+}
+
 - (void)updateContainerList
 {
     
@@ -201,6 +247,7 @@
         
         for (NemoContainer *con in self.containerList) {
             [client nemoHeadContainer:con.containerName success:^(NSString *containerName, NSError *jsonError) {
+                
             [self.tableView reloadData];
                 
             } failure:^(NSURLSessionTask *task, NSError *error) {
@@ -208,7 +255,6 @@
             }];
         }
 
-//        [[self tableView] reloadData];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         
         NMLog(@"error %@", error);
