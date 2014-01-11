@@ -22,6 +22,9 @@
 
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loginIndicator;
 
+
+#pragma mark - UIAction
+
 - (IBAction)doLogin:(id)sender;
 
 @end
