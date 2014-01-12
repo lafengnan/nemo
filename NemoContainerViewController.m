@@ -48,59 +48,82 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [[self tableView] reloadData];
+    
+    /** Because after new container created, the meta data info has not
+     *  been update while pop from NemoNewContainerViewController, the
+     *  UI needs to invoke HEAD operation before reloading data again
+     */
+    
+    NemoClient *client = [NemoClient getClient];
+    
+    for (NemoContainer *con in client.containerList) {
+        [client nemoHeadContainer:con success:^(NemoContainer *container, NSError *jsonError) {
+            
+            UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];              
+            [self.tableView addSubview:updateIndicator];
+            
+            [updateIndicator startAnimating];
+            [self.tableView reloadData];
+            [updateIndicator stopAnimating];
+        } failure:^(NSURLSessionTask *task, NSError *error) {
+            
+            NMLog(@"Update %@ Failed", con.containerName);
+            
+        }];
+    }
+
+    
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-     NMLog(@"table view did load");
+    NMLog(@"table view did load");
     // 1. Get client instance
     NemoClient *client = [NemoClient getClient];
-    //[client displayClientInfo];
     // 2. display containers
-//    dispatch_queue_t nemoGetAccountQueue = dispatch_queue_create("com.get.account.nemo", DISPATCH_QUEUE_CONCURRENT);
-//    dispatch_async(nemoGetAccountQueue, ^{
-        [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
-            /* Copy container list here */
-            [self setContainerList:(NSMutableArray *)containers];
-            
-            /* Do HEAD operation here to display cell detail lable */
-            for (NemoContainer *con in self.containerList) {
-                [client nemoHeadContainer:con.containerName success:^(NSString *containerName, NSError *jsonError) {
-                    NMLog(@"container: %@", containerName);
-                    NMLog(@"tableviw did load--->HEAD: %@", con.metaData);
-                    [self.tableView reloadData];
-                    
-                } failure:^(NSURLSessionTask *task, NSError *error) {
-                    ;
-                }];
-
-            }
-            
-            [self.tableView reloadData];
-            
-        } failure:^(NSURLSessionDataTask *task, NSError *error) {
-            
-            NMLog(@"error %@", error);
-            void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
-            {
-                NMLog(@"Get Token Successful from %@", client.storageUrl);
-                NMLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
-                NMLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
-                NMLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
-                NMLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
-                NMLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
-                NMLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+    [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
+        /* Copy container list here */
+        [self setContainerList:(NSMutableArray *)containers];
+        /* Do HEAD operation here to display cell detail lable */
+        for (NemoContainer *con in self.containerList) {
+            [client nemoHeadContainer:con success:^(NemoContainer *container, NSError *jsonError) {
+                NMLog(@"container: %@", con.containerName);
+                NMLog(@"tableviw did load--->HEAD: %@", con.metaData);
                 
-                NMLog(@"response--->%@", [task response]);
-                NMLog(@"account: %@", [[[client storageUrl] componentsSeparatedByString:@"/"] lastObject]);
-            };
+                UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+                [self.tableView addSubview:updateIndicator];
+                
+                [updateIndicator startAnimating];
+                [self.tableView reloadData];
+                [updateIndicator stopAnimating];
+                
+            } failure:^(NSURLSessionTask *task, NSError *error) {
+                ;
+            }];
             
-            displayTask(task);
-        }];
-//    });
-
+        }
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        
+        NMLog(@"error %@", error);
+        void (^displayTask)(NSURLSessionDataTask *t) = ^(NSURLSessionDataTask *task)
+        {
+            NMLog(@"Get Token Successful from %@", client.storageUrl);
+            NMLog(@"countOfBytesExpectedToReceive:  %lld", [task countOfBytesExpectedToReceive]);
+            NMLog(@"countOfBytesReceived: %lld", [task countOfBytesReceived]);
+            NMLog(@"countOfBytesExpectedToSend:  %lld", [task countOfBytesExpectedToSend]);
+            NMLog(@"countOfBytesSent: %lld", [task countOfBytesSent]);
+            NMLog(@"request--->header: %@", [[task currentRequest] allHTTPHeaderFields]);
+            NMLog(@"request--->method: %@", [[task currentRequest] HTTPMethod]);
+            
+            NMLog(@"response--->%@", [task response]);
+            NMLog(@"account: %@", [[[client storageUrl] componentsSeparatedByString:@"/"] lastObject]);
+        };
+        
+        displayTask(task);
+    }];
+    
     if (_refreshHeaderView == nil) {
         EGORefreshTableHeaderView *view1 =
         [[EGORefreshTableHeaderView alloc]initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height)];
@@ -109,7 +132,7 @@
         _refreshHeaderView = view1;
     }
     [_refreshHeaderView refreshLastUpdatedDate];
-
+    
 }
 
 #pragma mare - TableViewController Methods
@@ -175,9 +198,9 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         
         /* Send DELETE operation to Swift */
-        [client nemoDeleteContainer:container.containerName success:^(NSString *containerName, NSError *jsonError) {
+        [client nemoDeleteContainer:container success:^(NemoContainer *container, NSError *jsonError) {
             
-            NMLog(@"Debug: Container: %@ has deleted!", containerName);
+            NMLog(@"Debug: Container: %@ has deleted!", container.containerName);
             
             /* Remove the container in container list and update UI */
             [self.containerList removeObjectAtIndex:indexPath.row];
@@ -243,7 +266,7 @@
         [self setContainerList:(NSMutableArray *)containers];
         
         for (NemoContainer *con in self.containerList) {
-            [client nemoHeadContainer:con.containerName success:^(NSString *containerName, NSError *jsonError) {
+            [client nemoHeadContainer:con success:^(NemoContainer *container, NSError *jsonError) {
                 
             [self.tableView reloadData];
                 

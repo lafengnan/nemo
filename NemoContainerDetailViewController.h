@@ -11,6 +11,8 @@
 @class NemoContainer;
 @interface NemoContainerDetailViewController : UIViewController
 
+#pragma mark - Properties
+
 @property (weak, nonatomic) IBOutlet UILabel *bytesUsed;
 
 @property (weak, nonatomic) IBOutlet UILabel *objectCount;
@@ -18,6 +20,16 @@
 @property (weak, nonatomic) IBOutlet UIImageView *qrcodeImageView;
 
 @property (retain, nonatomic) NemoContainer *container;
+
+#pragma mark - Instance methods
+
+/** Genereate QR Code Image for specified container
+ *  @param container which will be used to generate QR Code
+ */
+
+- (UIImage *)generateQRImageWithContainer:(NemoContainer *)container;
+
+#pragma mark - Deprecated methods
 
 - (UIImage *)generateQRImageWithContainer:(NSString *)containerName
                                 bytesUsed:(NSString *)bytes

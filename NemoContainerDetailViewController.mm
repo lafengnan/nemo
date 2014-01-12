@@ -41,53 +41,10 @@
     
     NemoClient *client = [NemoClient getClient];
     
-    [client nemoHeadContainer:[self.container containerName] success:^(NSString *containerName, NSError *jsonError) {
-        
-        /** Set date format and displays it **/
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd 'at' HH:mm"];
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:[container.metaData[@"X-Timestamp"] doubleValue]];
-        NSString *formattedDateString = [dateFormatter stringFromDate:date];
-        [self.createTimeStamp setText:formattedDateString];
-        
-        [self.objectCount setText:container.metaData[@"X-Container-Object-Count"]];
-        
-        
-        NSString *bytesUsedUnit = @" Bytes";
-        NSInteger bytes = [self.container.metaData[@"X-Container-Bytes-Used"] integerValue];
-        
-        if ( bytes > KB && bytes < MB) {
-            
-            bytesUsedUnit = @" KB";
-            bytes /= KB;
-        }
-        else if ( bytes > MB &&
-                 bytes < GB)
-        {
-            bytesUsedUnit = @" MB";
-            bytes /= MB;
-        }
-        else if ( bytes > GB && bytes < TB)
-        {
-            bytesUsedUnit = @" GB";
-            bytes /= GB;
-        }
-        else if (bytes > TB)
-        {
-            bytes /= TB;
-            bytesUsedUnit = @" TB";
-        }
-        
-        [self.bytesUsed setText:[NSString stringWithFormat:@"%ld %@", bytes, bytesUsedUnit]];
-
-        [[self navigationItem] setTitle:self.container.containerName];
+    [client nemoHeadContainer:self.container success:^(NemoContainer *con, NSError *jsonError) {
         
         // Add QR Code Image here
-        
-        UIImage *qrcodeImage = [self generateQRImageWithContainer:self.container.containerName
-                                                        bytesUsed:[self.bytesUsed text]
-                                                      objectCount:[self.objectCount text]
-                                                        createdAt:[self.createTimeStamp text]];
+        UIImage *qrcodeImage = [self generateQRImageWithContainer:con];
         
         CGRect qrcodeImageViewFrame = CGRectMake(35, 266, 125.0, 125.0);
         
@@ -95,7 +52,7 @@
         
         [self.qrcodeImageView setImage:qrcodeImage];
         
-        
+        [[self navigationItem] setTitle:self.container.containerName];
         [self.view setNeedsDisplay];
     } failure:^(NSURLSessionTask *task, NSError *error) {
         ;
@@ -118,6 +75,65 @@
 }
 
 #pragma mark - Instance Methods
+
+/** Generate a QRCode Image by using container
+ *  @param container the container to generate QR code
+ */
+
+- (UIImage *)generateQRImageWithContainer:(NemoContainer *)con
+{
+    
+    // The qrcode is square, now we make it 250 pixels wide
+    int qrcodeImageDimension = 125;
+    
+    /** Set date format and displays it **/
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd 'at' HH:mm"];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:[con.metaData[@"X-Timestamp"] doubleValue]];
+    NSString *formattedDateString = [dateFormatter stringFromDate:date];
+    [self.createTimeStamp setText:formattedDateString];
+    
+    [self.objectCount setText:con.metaData[@"X-Container-Object-Count"]];
+    
+    
+    NSString *bytesUsedUnit = @" Bytes";
+    NSInteger bytes = [con.metaData[@"X-Container-Bytes-Used"] integerValue];
+    
+    if ( bytes > KB && bytes < MB) {
+        
+        bytesUsedUnit = @" KB";
+        bytes /= KB;
+    }
+    else if ( bytes > MB &&
+             bytes < GB)
+    {
+        bytesUsedUnit = @" MB";
+        bytes /= MB;
+    }
+    else if ( bytes > GB && bytes < TB)
+    {
+        bytesUsedUnit = @" GB";
+        bytes /= GB;
+    }
+    else if (bytes > TB)
+    {
+        bytes /= TB;
+        bytesUsedUnit = @" TB";
+    }
+    
+    [self.bytesUsed setText:[NSString stringWithFormat:@"%ld %@", bytes, bytesUsedUnit]];
+    
+    [[self navigationItem] setTitle:self.container.containerName];
+    
+    NSString *imageString = [NSString stringWithFormat:@"Container Name: %@\nUsed Space: %@\nObject Count: %@\nTimestamp: %@", con.containerName, [self.bytesUsed text], [self.objectCount text], [self.createTimeStamp text]];
+    NMLog(@"image string:%@", imageString);
+    DataMatrix *qrMatrix = [QREncoder encodeWithECLevel:QR_ECLEVEL_AUTO version:QR_VERSION_AUTO string:imageString];
+    
+    // Render the matrix
+    UIImage *qrcodeImage = [QREncoder renderDataMatrix:qrMatrix imageDimension:qrcodeImageDimension];
+    
+    return qrcodeImage;
+}
 
 /** Generate a QRCode Image by using containerName + bytesUsed + ObjectCount string
  *  @param containerName the name of container

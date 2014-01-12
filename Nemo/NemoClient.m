@@ -57,19 +57,15 @@ static id client = nil;
 }
 
 
-- (void)setHttpHeader:(NSDictionary *)headerDict withRequestSerializer:(AFHTTPRequestSerializer *)serial
+- (void)setHttpHeader:(NSDictionary *)headerDict
 {
-    if (!serial) {
+    if (!self.requestSerializer) {
         AFHTTPRequestSerializer *newSerial = [[AFHTTPRequestSerializer alloc] init];
         [self setRequestSerializer:newSerial];
     }
-    else
-    {
-        [self setRequestSerializer:serial];
-    }
     if (self.requestSerializer) {
         for (NSString *key in headerDict) {
-            NMLog(@"Debug: Key----value: %@-----%@", key, headerDict[key]);
+            NMLog(@"Debug: Key:value: %@:%@", key, headerDict[key]);
             [self.requestSerializer setValue:[headerDict objectForKey:key] forHTTPHeaderField:key];
         }
     }
@@ -93,7 +89,7 @@ static id client = nil;
 {
     
     // 1. Set header
-    [self setHttpHeader:@{@"X-Storage-User":self.userName, @"X-Storage-Pass":self.passWord} withRequestSerializer:nil] ;
+    [self setHttpHeader:@{@"X-Storage-User":self.userName, @"X-Storage-Pass":self.passWord}] ;
     
     // Set authentication url to: http://192.168.1.106:8080/auth/v1.0
     self.authUrl = [NSURL URLWithString:@"auth/v1.0" relativeToURL:self.baseURL];
@@ -168,7 +164,7 @@ static id client = nil;
     }];
 }
 
-#pragma mark - HTTP Operations
+#pragma mark - Container Operations
 
 - (void)nemoGetAccount:(void (^)(NSArray *containers, NSError *error))successHandler failure:(void (^)(NSURLSessionDataTask *task, NSError *error))failureHandler
 {
@@ -181,7 +177,7 @@ static id client = nil;
     [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
     [self setResponseSerializer:resSerializer];
     if (self.authenticated) {
-        [self setHttpHeader:@{@"X-Auth-Token": self.authToken} withRequestSerializer:nil];
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
     }
     
     AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
@@ -213,10 +209,10 @@ static id client = nil;
     
 }
 
-- (void)nemoHeadContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *error))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure
+- (void)nemoHeadContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NSError *error))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure
 {
     
-    NMLog(@"Debug HEAD Container: %@", containerName);
+    NMLog(@"Debug HEAD Container: %@", container.containerName);
     
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
@@ -228,12 +224,12 @@ static id client = nil;
     [self setResponseSerializer:resSerializer];
     
     if (self.authenticated) {
-        [self setHttpHeader:@{@"X-Auth-Token": self.authToken} withRequestSerializer:nil];
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
     }
     AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
     [self setResponseSerializer:jsonSerializer];
     
-    NSString *headURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, containerName];
+    NSString *headURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, container.containerName];
     
     
     NMLog(@"Debug head URL: %@", headURLString);
@@ -241,17 +237,12 @@ static id client = nil;
     task = [self HEAD:headURLString parameters:@{@"format":@"json"} success:^(NSURLSessionDataTask *task) {
         
         NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
-        NMLog(@"Debug HEAD %@", containerName);
+        NMLog(@"Debug HEAD %@", container.containerName);
         NMLog(@"Debug header: %@", header);
-        for (NemoContainer *con in self.containerList) {
-            if ([con.containerName isEqualToString:containerName]) {
-                [con setMetaData:header];
-            }
-        }
+        [container setMetaData:header];
         if (success) {
-            success(containerName, nil);
+            success(container, nil);
         }
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"HEAD Container" object:nil];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (failure) {
             failure(task, error);
@@ -273,10 +264,10 @@ static id client = nil;
     [self setResponseSerializer:resSerializer];
     
     if (self.authenticated) {
-        [self setHttpHeader:@{@"X-Auth-Token": self.authToken} withRequestSerializer:nil];
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
         if (newContainer.metaData) {
             NMLog(@"Debug --- meta data: %@", newContainer.metaData);
-            [self setHttpHeader:newContainer.metaData withRequestSerializer:self.requestSerializer];
+            [self setHttpHeader:newContainer.metaData];
             NMLog(@"Header: %@", [[self requestSerializer] HTTPRequestHeaders]);
         }
     }
@@ -309,9 +300,9 @@ static id client = nil;
     
 }
 
-- (void)nemoDeleteContainer:(NSString *)containerName success:(void (^)(NSString *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
+- (void)nemoDeleteContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
 {
-    NMLog(@"Debug Delete container: %@", containerName);
+    NMLog(@"Debug Delete container: %@", container.containerName);
     
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
@@ -322,26 +313,26 @@ static id client = nil;
     [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
     [self setResponseSerializer:resSerializer];
     if (self.authenticated) {
-        [self setHttpHeader:@{@"X-Auth-Token": self.authToken} withRequestSerializer:nil];
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
     }
     AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
     [self setResponseSerializer:jsonSerializer];
     
-    NSString *deleteURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, containerName];
+    NSString *deleteURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, container.containerName];
     
     task = [self DELETE:deleteURLString parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
-        NMLog(@"Debug: Delete container: %@ Successfully!", containerName);
+        NMLog(@"Debug: Delete container: %@ Successfully!", container.containerName);
         NMLog(@"Debug: response: %@", [task response]);
         NMLog(@"Debug: response Obj: %@", responseObject);
         
         if (success) {
-            success(containerName, nil);
+            success(container, nil);
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         
-        NMLog(@"Debug: Delete container: %@ Failed!", containerName);
+        NMLog(@"Debug: Delete container: %@ Failed!", container.containerName);
         NMLog(@"Debug: response: %@", [task response]);
         NMLog(@"Debug: error: %@", error);
         
@@ -349,8 +340,8 @@ static id client = nil;
          * status code 409 returned if delete an nonempty container
          */
         if ([(NSHTTPURLResponse *)[task response] statusCode] == 409) {
-            NMLog(@"Debug: Conflict happens while deleting %@", containerName);
-            NSString *msg = [NSString stringWithFormat:@"%@ is not empty, Deletion is forbidden!", containerName];
+            NMLog(@"Debug: Conflict happens while deleting %@", container.containerName);
+            NSString *msg = [NSString stringWithFormat:@"%@ is not empty, Deletion is forbidden!", container.containerName];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Failed!" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
         }

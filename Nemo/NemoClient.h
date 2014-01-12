@@ -51,9 +51,13 @@
 - (void)authentication:(NSString *)authType success:(void (^)(UIViewController *vc))successHandler failure:(void (^)(UIViewController *vc, NSError *err))failHandler;
 - (void)getTempAuth:(void (^)(UIViewController *vc))success failure:(void (^)(UIViewController *vc, NSError *err))fail;
 
-#pragma mark - Http Operations
+/** Set HTTP header before send request
+ *  @param headerDict stores the header keys and values
+ */
+- (void)setHttpHeader:(NSDictionary *)headerDict;
 
-- (void)setHttpHeader:(NSDictionary *)headerDict withRequestSerializer:(AFHTTPRequestSerializer *)serial;
+
+#pragma mark - Container Operations
 
 /** Get container list in the account
  *  @param successHandler executes if successful
@@ -62,16 +66,18 @@
 - (void)nemoGetAccount:(void (^)(NSArray *containers, NSError *jsonError))success failure:(void (^)(NSURLSessionDataTask *task, NSError *error))failure ;
 
 /** Get container meta data in the container
+ *  @param containerName passes which container will be HEAD
  *  @param successHandler executes if successful
  *  @param failureHandler executes if failed
  */
-- (void)nemoHeadContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
+- (void)nemoHeadContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
 
 /** Get container data in the container
+ *  @param containerName passes which container will be GET
  *  @param successHandler executes if successful
  *  @param failureHandler executes if failed
  */
-- (void)nemoGetContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
+- (void)nemoGetContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
 
 /** Put a new container into the account
  *  @param newContainer the container to add
@@ -85,7 +91,9 @@
  *  @param successHandler executes if successful
  *  @param failureHandler executes if failed
  */
-- (void)nemoDeleteContainer:(NSString *)containerName success:(void (^)(NSString *containerName, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
+- (void)nemoDeleteContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
+
+#pragma mark - Object Operations
 /*
 
 - (void)nemoPutPath:(NSString *)path container:(NSString *)con object:(NSString *)obj;
