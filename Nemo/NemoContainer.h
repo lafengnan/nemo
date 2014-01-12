@@ -8,12 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
+@class NemoObject;
+
 @interface NemoContainer : NSObject
 
 #pragma mark - Properties
 
 @property (nonatomic, retain) NSString *containerName;
 @property (nonatomic, retain) NSDictionary *metaData;
+@property (nonatomic, retain) NSMutableArray *objectList;
 
 
 #pragma mark - Initializer

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @class NemoContainer;
-@interface NemoContainerDetailViewController : UIViewController
+@interface NemoContainerDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 #pragma mark - Properties
 
@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *objectCount;
 @property (weak, nonatomic) IBOutlet UILabel *createTimeStamp;
 @property (weak, nonatomic) IBOutlet UIImageView *qrcodeImageView;
+@property (weak, nonatomic) IBOutlet UITableView *objectTableView;
 
 @property (retain, nonatomic) NemoContainer *container;
 

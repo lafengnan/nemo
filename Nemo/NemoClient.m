@@ -8,6 +8,7 @@
 
 #import "NemoClient.h"
 #import "NemoContainer.h"
+#import "NemoObject.h"
 
 
 #define NEMO_DEBUG
@@ -164,7 +165,7 @@ static id client = nil;
     }];
 }
 
-#pragma mark - Container Operations
+#pragma mark - OpenStack/Swift Container HTTP RESTful API Operations
 
 - (void)nemoGetAccount:(void (^)(NSArray *containers, NSError *error))successHandler failure:(void (^)(NSURLSessionDataTask *task, NSError *error))failureHandler
 {
@@ -252,6 +253,62 @@ static id client = nil;
     [task resume];
 }
 
+- (void)nemoGetContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
+{
+    
+    NMLog(@"Debug GET Container: %@", container.containerName);
+    
+    NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
+    
+    AFHTTPRequestSerializer *reqSerializer = [[AFHTTPRequestSerializer alloc] init];
+    [self setRequestSerializer:reqSerializer];
+    
+    AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
+    [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
+    [self setResponseSerializer:resSerializer];
+    
+    if (self.authenticated) {
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+    }
+    AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
+    [self setResponseSerializer:jsonSerializer];
+    
+    NSString *getURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, container.containerName];
+    
+    
+    NMLog(@"Debug GET URL: %@", getURLString);
+    
+    task = [self GET:getURLString parameters:@{@"format":@"json"} success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
+        NSMutableArray *tmpObjects = (NSMutableArray *)responseObject;
+        for (NSDictionary *dic in tmpObjects) {
+            NMLog(@"Debug: dic is %@", dic);
+            NemoObject *newObj = [[NemoObject alloc] initWithObjectName:dic[@"name"] imageType:nil andMetaData:nil];
+            if (newObj) {
+                [newObj setSize:dic[@"bytes"]];
+                [newObj setContentType:dic[@"content_type"]];
+                [newObj setEtag:dic[@"hash"]];
+                [newObj setLastUpdated:dic[@"last_modified"]];
+                [container.objectList addObject:newObj];
+            }
+        }
+        NMLog(@"Debug: GET %@", container.containerName);
+        NMLog(@"Debug: header: %@", header);
+        NMLog(@"Debug: object List: %@", container.objectList);
+        if (success) {
+            success(container, nil);
+        }
+
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        if (failure) {
+            failure(task, error);
+        }
+    }];
+    
+    [task resume];
+}
+
 - (void)nemoPutContainer:(NemoContainer *)newContainer success:(void (^)(NemoContainer *, NSError *))successHandler failure:(void (^)(NSURLSessionTask *, NSError *))failureHandler
 {
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
@@ -295,8 +352,7 @@ static id client = nil;
         ;
     }];
     
-    
-    
+    [task resume];
     
 }
 
@@ -335,6 +391,23 @@ static id client = nil;
         NMLog(@"Debug: Delete container: %@ Failed!", container.containerName);
         NMLog(@"Debug: response: %@", [task response]);
         NMLog(@"Debug: error: %@", error);
+        
+        /* Container could not be deleted if authentication expired
+         * status code 401 returned if need re-authentication
+         */
+        if ([(NSHTTPURLResponse*)[task response] statusCode] == 401) {
+            NMLog(@"Debug: authenticated while deleteing: %@", container.containerName);
+            NMLog(@"Re-auth again");
+            [self authentication:@"tmpAuth" success:^(UIViewController *vc) {
+                [self nemoDeleteContainer:container success:^(NemoContainer *container, NSError *jsonError) {
+                    ;
+                } failure:^(NSURLSessionTask *task, NSError *error) {
+                    ;
+                }];
+            } failure:^(UIViewController *vc, NSError *err) {
+                ;
+            }];
+        }
         
         /* Container could not be deleted if it has objects 
          * status code 409 returned if delete an nonempty container

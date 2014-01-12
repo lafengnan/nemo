@@ -10,7 +10,7 @@
 
 @implementation NemoContainer
 
-@synthesize containerName, metaData;
+@synthesize containerName, metaData, objectList;
 
 - (id)init
 {
@@ -22,6 +22,9 @@
     if (self = [super init]) {
         [self setContainerName:name];
         [self setMetaData:meta];
+        // Lazy Initialization of objectList
+        // Object List is not initialized unitl Object count > 0
+        [self setObjectList:nil];
     }
     
     return self;

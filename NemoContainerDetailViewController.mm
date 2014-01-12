@@ -8,6 +8,7 @@
 
 #import "NemoContainerDetailViewController.h"
 #import "NemoContainer.h"
+#import "NemoObject.h"
 #import "NemoClient.h"
 #import "QREncoder.h"
 
@@ -21,7 +22,7 @@
 @end
 
 @implementation NemoContainerDetailViewController
-@synthesize bytesUsed, createTimeStamp, objectCount, qrcodeImageView, container;
+@synthesize bytesUsed, createTimeStamp, objectCount, qrcodeImageView, objectTableView, container;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -37,7 +38,7 @@
 {
     [super viewWillAppear:animated];
     
-    NMLog(@"view will appear");
+    NMLog(@"%@view will appear", self);
     
     NemoClient *client = [NemoClient getClient];
     
@@ -46,13 +47,24 @@
         // Add QR Code Image here
         UIImage *qrcodeImage = [self generateQRImageWithContainer:con];
         
-        CGRect qrcodeImageViewFrame = CGRectMake(35, 266, 125.0, 125.0);
-        
+//        CGRect qrcodeImageViewFrame = CGRectMake(35, 250, 100.0, 100.0);
+        CGRect qrcodeImageViewFrame = CGRectMake(35, 360, 100.0, 100.0);
         [qrcodeImageView setFrame:qrcodeImageViewFrame];
         
         [self.qrcodeImageView setImage:qrcodeImage];
         
         [[self navigationItem] setTitle:self.container.containerName];
+        
+        // Get Object List if object count > 0
+        if ([self.container.metaData[@"X-Container-Object-Count"] intValue] > 0) {
+            // Lazy init object list here
+            self.container.objectList = [[NSMutableArray alloc] init];
+            [client nemoGetContainer:self.container success:^(NemoContainer *container, NSError *jsonError) {
+                [self.objectTableView reloadData];
+            } failure:^(NSURLSessionTask *task, NSError *error) {
+                ;
+            }];
+        }
         [self.view setNeedsDisplay];
     } failure:^(NSURLSessionTask *task, NSError *error) {
         ;
@@ -65,6 +77,8 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    [self.objectTableView setDelegate:self];
+    [self.objectTableView setDataSource:self];
     
 }
 
@@ -84,7 +98,7 @@
 {
     
     // The qrcode is square, now we make it 250 pixels wide
-    int qrcodeImageDimension = 125;
+    int qrcodeImageDimension = 120;
     
     /** Set date format and displays it **/
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -155,6 +169,105 @@
     UIImage *qrcodeImage = [QREncoder renderDataMatrix:qrMatrix imageDimension:qrcodeImageDimension];
     
     return qrcodeImage;
+}
+
+#pragma mark - tableviwe methods
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return [NSString stringWithFormat:@"Objects Count: %lu", (unsigned long)[self.container.objectList count]];
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+//    return [self.container.metaData[@"X-Container-Object-Count"] intValue];
+    return [self.container.objectList count];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+
+    NemoObject *object = [self.container.objectList objectAtIndex:[indexPath row]];
+    NMLog(@"Debug: object size: %@", object.size);
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ObjectList"];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ObjectList"];
+        [cell.imageView setImage:[UIImage imageNamed:@"file_32.png"]];
+        if ([[NSString stringWithFormat:@"%@", object.size] isEqualToString:@"0"]) {
+            [cell.imageView setImage:[UIImage imageNamed:@"folder.png"]];
+        }
+    }
+   
+    [[cell textLabel] setText:[object objectName]];
+    
+    /** Self define new accessory type **/
+    
+//    [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+    
+    UIButton *button ;
+    if (!tableView.isEditing) {
+        UIImage *image= [UIImage imageNamed:@"download_file.png"];
+        button = [UIButton buttonWithType:UIButtonTypeCustom];
+        CGRect frame = CGRectMake(0.0, 0.0, image.size.width, image.size.height);
+        button.frame = frame;
+        
+        [button setBackgroundImage:image forState:UIControlStateNormal];
+        button.backgroundColor= [UIColor clearColor];
+        cell.accessoryView= button;
+    }
+    
+    return cell;
+}
+
+/** If one row is selected the detail view pops from right
+ *  Using a navigationcontroller to controll NemoContainerDetailViewController
+ *  and the root controller
+ */
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+//    NemoContainerDetailViewController *containerDetailVc = [[NemoContainerDetailViewController alloc] init];
+//    
+//    NemoContainer *container = [containerList objectAtIndex:[indexPath row]];
+//    
+//    [containerDetailVc setContainer:container];
+//    
+//    [self.navigationController pushViewController:containerDetailVc animated:YES];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+
+/** Delete the container while left moving tableviewcell
+ *  Container could not be delete unless there is no object
+ *  in the container
+ */
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    /* Get client and container which willbe edit */
+    __block NemoClient *client = [NemoClient getClient];
+    
+    
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        
+        [self.container.objectList removeObjectAtIndex:indexPath.row];
+        
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation: UITableViewRowAnimationFade];
+        
+    }
+    if (editingStyle == UITableViewCellEditingStyleInsert) {
+        //
+        //        NemoContainer *newContainer = [[NemoContainer alloc] initWithContainerName:@"new" withMetaData:nil];
+        //        [containerList addObject:newContainer];
+        [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
+    
 }
 
 @end
