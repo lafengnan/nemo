@@ -57,6 +57,8 @@
 		8FA8B7C21879A414003EF3FD /* grayArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7BA1879A414003EF3FD /* grayArrow@2x.png */; };
 		8FA8B7C31879A414003EF3FD /* whiteArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7BB1879A414003EF3FD /* whiteArrow.png */; };
 		8FA8B7C41879A414003EF3FD /* whiteArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FA8B7BC1879A414003EF3FD /* whiteArrow@2x.png */; };
+		8FC8BF0618842CA000C890FE /* NemoMetaDataSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC8BF0418842CA000C890FE /* NemoMetaDataSelectorViewController.m */; };
+		8FC8BF0718842CA000C890FE /* NemoMetaDataSelectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8FC8BF0518842CA000C890FE /* NemoMetaDataSelectorViewController.xib */; };
 		8FE6DA97186DBCDF003E7EC0 /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FE6DA85186DBCDF003E7EC0 /* AFHTTPRequestOperation.m */; };
 		8FE6DA98186DBCDF003E7EC0 /* AFHTTPRequestOperationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FE6DA87186DBCDF003E7EC0 /* AFHTTPRequestOperationManager.m */; };
 		8FE6DA99186DBCDF003E7EC0 /* AFHTTPSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FE6DA89186DBCDF003E7EC0 /* AFHTTPSessionManager.m */; };
@@ -153,6 +155,9 @@
 		8FA8B7BA1879A414003EF3FD /* grayArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "grayArrow@2x.png"; sourceTree = "<group>"; };
 		8FA8B7BB1879A414003EF3FD /* whiteArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteArrow.png; sourceTree = "<group>"; };
 		8FA8B7BC1879A414003EF3FD /* whiteArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "whiteArrow@2x.png"; sourceTree = "<group>"; };
+		8FC8BF0318842CA000C890FE /* NemoMetaDataSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoMetaDataSelectorViewController.h; sourceTree = "<group>"; };
+		8FC8BF0418842CA000C890FE /* NemoMetaDataSelectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoMetaDataSelectorViewController.m; sourceTree = "<group>"; };
+		8FC8BF0518842CA000C890FE /* NemoMetaDataSelectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NemoMetaDataSelectorViewController.xib; sourceTree = "<group>"; };
 		8FE6DA84186DBCDF003E7EC0 /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
 		8FE6DA85186DBCDF003E7EC0 /* AFHTTPRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPRequestOperation.m; sourceTree = "<group>"; };
 		8FE6DA86186DBCDF003E7EC0 /* AFHTTPRequestOperationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperationManager.h; sourceTree = "<group>"; };
@@ -327,6 +332,9 @@
 				8F959E4618634CBE0096CED8 /* NemoContainerViewController.m */,
 				8F14542418819593001D772E /* NemoNewContainerViewController.h */,
 				8F14542518819593001D772E /* NemoNewContainerViewController.m */,
+				8FC8BF0318842CA000C890FE /* NemoMetaDataSelectorViewController.h */,
+				8FC8BF0418842CA000C890FE /* NemoMetaDataSelectorViewController.m */,
+				8FC8BF0518842CA000C890FE /* NemoMetaDataSelectorViewController.xib */,
 				8F14542618819593001D772E /* NemoNewContainerViewController.xib */,
 				8F02C19C187AD9DA00F0A92A /* NemoContainerDetailViewController.h */,
 				8F02C19D187AD9DA00F0A92A /* NemoContainerDetailViewController.mm */,
@@ -534,6 +542,7 @@
 				8F02C19B187AD13100F0A92A /* object_32.png in Resources */,
 				8F5196C818620CD800D997F3 /* cloud3.jpg in Resources */,
 				8F14542818819593001D772E /* NemoNewContainerViewController.xib in Resources */,
+				8FC8BF0718842CA000C890FE /* NemoMetaDataSelectorViewController.xib in Resources */,
 				8F692E441882DB660087B229 /* download_file.png in Resources */,
 				8FA8B7BF1879A414003EF3FD /* blueArrow.png in Resources */,
 				8F02C197187AC2E200F0A92A /* container_item_64.png in Resources */,
@@ -614,6 +623,7 @@
 				8FE6DA97186DBCDF003E7EC0 /* AFHTTPRequestOperation.m in Sources */,
 				8FE6DA9F186DBCDF003E7EC0 /* AFURLSessionManager.m in Sources */,
 				8F51968F1861E70E00D997F3 /* NemoAppDelegate.m in Sources */,
+				8FC8BF0618842CA000C890FE /* NemoMetaDataSelectorViewController.m in Sources */,
 				8FE6DAB7186DBD44003E7EC0 /* UIWebView+AFNetworking.m in Sources */,
 				8F5196B31861EE0200D997F3 /* HomePageViewController.m in Sources */,
 				8FE6DA99186DBCDF003E7EC0 /* AFHTTPSessionManager.m in Sources */,

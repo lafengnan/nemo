@@ -205,6 +205,7 @@
     }
    
     [[cell textLabel] setText:[object objectName]];
+//    [[cell textLabel] setTextColor:[UIColor colorWithRed:50.0f/256.0f green:100.0f/256.0f blue:1.0f alpha:1.0f]];
     
     /** Self define new accessory type **/
     

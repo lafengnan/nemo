@@ -10,13 +10,14 @@
 
 @class NemoContainer;
 
-@interface NemoNewContainerViewController : UIViewController <UITextFieldDelegate>
+@interface NemoNewContainerViewController : UIViewController <UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITextField *containerName;
 @property (weak, nonatomic) IBOutlet UISwitch *isRetention;
+@property (weak, nonatomic) IBOutlet UISwitch *willAddMetaData;
 @property (weak, nonatomic) IBOutlet UITableView *metaDataTableView;
 
-@property (nonatomic, retain) NemoContainer *addContainer;
+@property (nonatomic, retain) NemoContainer *nemoNewContainer;
 
 
 //

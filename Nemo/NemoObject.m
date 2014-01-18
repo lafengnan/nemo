@@ -7,33 +7,47 @@
 //
 
 #import "NemoObject.h"
+#import "NemoContainer.h"
 
 @implementation NemoObject
-@synthesize objectName, objectTypeImage, objectMetaData, size, etag,lastUpdated, contentType;
+@synthesize objectName, fileExtension, metaData, size, etag,lastModified, contentType, masterContainer;
 
 
 #pragma mark - Initializer
 
 - (id)init
 {
-    return [self initWithObjectName:@"object" imageType:nil andMetaData:nil];
+    return [self initWithObjectName:@"object" fileExtension:@"file" andMetaData:nil];
 }
 
-- (id)initWithObjectName:(NSString *)name imageType:(UIImage *)image andMetaData:(NSMutableArray *)meta
+- (id)initWithObjectName:(NSString *)name fileExtension:(NSString *)extension andMetaData:(NSMutableDictionary *)meta
 {
     if (self = [super init]) {
         [self setObjectName:name];
-        [self setObjectTypeImage:image];
-        [self setObjectMetaData:meta];
+        [self setFileExtension:extension];
+        [self setMetaData:meta];
         [self setSize:@"0"];
         [self setEtag:@"b125ddd05b8011a7f6568210d3a3325d"];
-        [self setLastUpdated:@"2014-1-1"];
+        [self setLastModified:@"2014-1-1"];
         [self setContentType:@"application/octet-stream"];
     }
     
     return self;
 }
 
+- (BOOL)isEqualToObject:(NemoObject *)destObj
+{
+    if (self && destObj) {
+        if ([self.objectName isEqualToString:destObj.objectName]) {
+            if ([self.masterContainer.containerName isEqualToString:destObj.masterContainer.containerName]) {
+                return YES;
+            }
+        }
+        else
+            return NO;
+    }
+    return  NO;
+}
 
 
 @end

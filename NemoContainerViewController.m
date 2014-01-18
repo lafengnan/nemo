@@ -85,18 +85,23 @@
     [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
         /* Copy container list here */
         [self setContainerList:(NSMutableArray *)containers];
+        UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [self.tableView addSubview:updateIndicator];
+        
+        [updateIndicator startAnimating];
         /* Do HEAD operation here to display cell detail lable */
         for (NemoContainer *con in self.containerList) {
             [client nemoHeadContainer:con success:^(NemoContainer *container, NSError *jsonError) {
                 NMLog(@"container: %@", con.containerName);
                 NMLog(@"tableviw did load--->HEAD: %@", con.metaData);
                 
-                UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-                [self.tableView addSubview:updateIndicator];
                 
-                [updateIndicator startAnimating];
-                [self.tableView reloadData];
-                [updateIndicator stopAnimating];
+                if ([con.containerName isEqualToString:[(NemoContainer *)[self.containerList lastObject] containerName]]) {
+        
+                    [self.tableView reloadData];
+                    [updateIndicator stopAnimating];
+                }
+                
                 
             } failure:^(NSURLSessionTask *task, NSError *error) {
                 ;
@@ -151,13 +156,11 @@
         [cell.imageView setImage:[UIImage imageNamed:@"container_32.png"]];
     }
     
-    /** detailTextLabel will displays meta data of the 
-     *  container, so that a head operation needs to be 
-     *  performed here.
-     */
+
     NemoContainer *container = [containerList objectAtIndex:[indexPath row]];
     
     [[cell textLabel] setText:container.containerName];
+    
     
     /** Set date format and displays it **/
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -166,6 +169,8 @@
     NSString *formattedDateString = [@"Last Update: " stringByAppendingString:[dateFormatter stringFromDate:date]];
 
     [[cell detailTextLabel] setText:formattedDateString];
+    [[cell detailTextLabel] setTextColor:[UIColor colorWithRed:50.0f/256.0f green:100.0f/256.0f blue:1.0f alpha:1.0f]];
+    
     [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
     
     

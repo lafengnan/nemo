@@ -10,18 +10,31 @@
 
 @class NemoObject;
 
+
+#pragma mark Enum
+
+typedef NS_ENUM(NSInteger, NemoContainerMetaDataType) {
+    NemoContainerMetaDataTypeRetention,
+    NemoContainerMetadataTypeTest,
+    NemoContainerMetaDataTypeProduct
+};
+
 @interface NemoContainer : NSObject
 
 #pragma mark - Properties
 
 @property (nonatomic, retain) NSString *containerName;
-@property (nonatomic, retain) NSDictionary *metaData;
+@property (nonatomic, retain) NSMutableDictionary *metaData;
 @property (nonatomic, retain) NSMutableArray *objectList;
 
 
 #pragma mark - Initializer
 
-- (id)initWithContainerName:(NSString *)name withMetaData:(NSDictionary *)meta;
+- (id)initWithContainerName:(NSString *)name withMetaData:(NSMutableDictionary *)meta;
 - (id)init;
+
+#pragma mark - Compare
+
+- (BOOL)isEqualToContainer:(NemoContainer *)destContainer;
 
 @end

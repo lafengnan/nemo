@@ -17,7 +17,7 @@
     return [self initWithContainerName:nil withMetaData:nil];
 }
 
-- (id)initWithContainerName:(NSString *)name withMetaData:(NSDictionary *)meta
+- (id)initWithContainerName:(NSString *)name withMetaData:(NSMutableDictionary *)meta
 {
     if (self = [super init]) {
         [self setContainerName:name];
@@ -28,6 +28,17 @@
     }
     
     return self;
+}
+
+- (BOOL)isEqualToContainer:(NemoContainer *)destContainer
+{
+    BOOL rc = NO;
+    if (destContainer) {
+        if ([self.containerName isEqualToString:destContainer.containerName]) {
+            rc = YES;
+        }
+    }
+    return rc;
 }
 
 @end

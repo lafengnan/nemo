@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class NemoContainer;
+
 @interface NemoObject : NSObject
 
 #pragma mark - Properties
@@ -15,14 +17,20 @@
 @property (nonatomic, retain) NSString *objectName;
 @property (nonatomic, retain) NSString *size;
 @property (nonatomic, retain) NSString *etag;
-@property (nonatomic, retain) NSString *lastUpdated;
+@property (nonatomic, retain) NSString *lastModified;
 @property (nonatomic, retain) NSString *contentType;
-@property (nonatomic, retain) UIImage *objectTypeImage;
-@property (nonatomic, retain) NSMutableArray *objectMetaData;
+@property (nonatomic, retain) NSString *fileExtension;
+@property (nonatomic, retain) NSMutableDictionary *metaData;
+@property (nonatomic, weak) NemoContainer *masterContainer;
 
 
 #pragma mark - Initializer
 
-- (id)initWithObjectName:(NSString *)name imageType:(UIImage *)image andMetaData:(NSMutableArray *)meta;
+- (id)initWithObjectName:(NSString *)name fileExtension:(NSString *)extension andMetaData:(NSMutableArray *)meta;
+
+#pragma mark - Compare
+
+- (BOOL)isEqualToObject:(NemoObject *)destObj;
+
 
 @end

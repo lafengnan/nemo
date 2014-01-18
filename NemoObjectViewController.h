@@ -7,9 +7,26 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "EGORefreshTableHeaderView.h"
+#import "NemoObject.h"
 
-@interface NemoObjectViewController : UIViewController
+@interface NemoObjectViewController : UITableViewController <EGORefreshTableHeaderDelegate>
+{
+    BOOL isflage;
+    BOOL _reloading;
+    EGORefreshTableHeaderView *_refreshHeaderView;
+}
 
-@property (nonatomic, readonly) UIWebView *myWebView;
+//@property (nonatomic, readonly) UIWebView *myWebView;
+
+@property (nonatomic, retain) NSMutableArray *objectList;
+
+
+- (id)initWithObjectList:(NSMutableArray *)objects;
+- (void)updateObjectList;
+- (void)doneUpdatingObjectList;
+
+- (IBAction)addNewObject:(id)sender;
+
 
 @end

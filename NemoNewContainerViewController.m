@@ -15,12 +15,17 @@
 @end
 
 @implementation NemoNewContainerViewController
-@synthesize containerName, isRetention, metaDataTableView, addContainer;
+@synthesize containerName, isRetention, willAddMetaData, metaDataTableView, nemoNewContainer;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        
+        // Init container
+        [self setNemoNewContainer:[[NemoContainer alloc] initWithContainerName:@"test" withMetaData:nil]];
+        self.nemoNewContainer.metaData = [[NSMutableDictionary alloc] initWithDictionary:@{@"X-Container-Meta-Test": @"test"}];
+        
         // Custom initialization
         // Set UINavigationItem
         UIBarButtonItem *rbbi = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
@@ -32,6 +37,7 @@
         [[self navigationItem] setTitle:@"New Container"];
         [[self navigationItem] setRightBarButtonItem:rbbi animated:YES];
         [[self navigationItem] setLeftBarButtonItem:lbbi animated:YES];
+       
     }
     return self;
 }
@@ -52,13 +58,17 @@
     __block NemoClient *client = [NemoClient getClient];
     
     
-    NSDictionary *metaData = @{@"X-Container-Retention":[NSString stringWithFormat:@"%d", [isRetention isOn]]};
+    NSDictionary *metaData = @{@"X-Container-Meta-Retention":[NSString stringWithFormat:@"%d", [isRetention isOn]]};
     
-   
-    NemoContainer *newContainer = [[NemoContainer alloc] initWithContainerName:[containerName text] withMetaData:metaData];
+    [self.nemoNewContainer setContainerName:[containerName text]];
+    if (!self.nemoNewContainer.metaData)
+        [self.nemoNewContainer setMetaData:(NSMutableDictionary *)metaData];
+    else
+        [self.nemoNewContainer.metaData setValue:[NSString stringWithFormat:@"%d",[isRetention isOn]]
+                                          forKey:@"X-Container-Meta-Retention"];
     
-    if (client && newContainer) {
-        [client nemoPutContainer:newContainer success:^(NemoContainer *newContainer, NSError *error) {
+    if (client && self.nemoNewContainer) {
+        [client nemoPutContainer:self.nemoNewContainer success:^(NemoContainer *newContainer, NSError *error) {
             NMLog(@"Debug: %@ PUT successfully!", newContainer.containerName);
             
             [[client containerList] addObject:newContainer];
@@ -68,7 +78,7 @@
             [self.navigationController popToRootViewControllerAnimated:YES];
             
         } failure:^(NSURLSessionTask *task, NSError *error) {
-            NMLog(@"Debug: %@ PUT Failed", newContainer.containerName);
+            NMLog(@"Debug: %@ PUT Failed", self.nemoNewContainer.containerName);
             NMLog(@"Debug: Error: %@", error.localizedDescription);
             [self.navigationController popToRootViewControllerAnimated:YES];
         }];
@@ -88,7 +98,13 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     [containerName setDelegate:self];
+    [metaDataTableView setDelegate:self];
+    [metaDataTableView setDataSource:self];
+    [isRetention setOn:NO animated:YES];
+    [willAddMetaData setOn:YES animated:YES];
+    [metaDataTableView setEditing:YES animated:YES];
 }
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -111,15 +127,7 @@
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-//    NSTimeInterval animationDuration = 0.30f;
-//    CGRect frame = self.view.frame;
-//    frame.origin.y +=120*(1 + 0.5 * textField.tag);
-//    frame.size.height -=120*(1 + 0.5 * textField.tag);
-//    self.view.frame = frame;
-//    //self.view移回原位置
-//    [UIView beginAnimations:@"ResizeView" context:nil];
-//    [UIView setAnimationDuration:animationDuration];
-//    self.view.frame = frame;
+
     [UIView commitAnimations];
     [textField resignFirstResponder];
     
@@ -136,30 +144,19 @@
     return YES;
 }
 
-- (BOOL)textField:(UITextField*)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
-    //当用户使用自动更正功能，把输入的文字修改为推荐的文字时，就会调用这个方法。
-    //这对于想要加入撤销选项的应用程序特别有用
-    //可以跟踪字段内所做的最后一次修改，也可以对所有编辑做日志记录,用作审计用途。
-    //要防止文字被改变可以返回NO
-    //这个方法的参数中有一个NSRange对象，指明了被改变文字的位置，建议修改的文本也在其中
-    
+- (BOOL)textField:(UITextField*)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
     return YES;
 }
-- (BOOL)textFieldShouldClear:(UITextField *)textField{
-    //返回一个BOOL值指明是否允许根据用户请求清除内容
-    //可以设置在特定条件下才允许清除内容
+- (BOOL)textFieldShouldClear:(UITextField *)textField
+{
+
     return YES;
 }
--(BOOL)textFieldShouldReturn:(UITextField *)textField{
-    //之前视图上移了  现在移回来
-    //    CGRect frame = self.view.frame;
-    //    frame.origin.y +=120;
-    //    frame.size.height -=120;
-    //    self.view.frame = frame;
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
     NMLog(@"textfield:%@", textField);
-    //返回一个BOOL值，指明是否允许在按下回车键时结束编辑
-    //如果允许要调用resignFirstResponder 方法，这回导致结束编辑，而键盘会被收起
-    [textField resignFirstResponder];//查一下resign这个单词的意思就明白这个方法了
+    [textField resignFirstResponder];
     
     return YES;
 }
@@ -170,8 +167,97 @@
     [containerName resignFirstResponder];
 }
 
+#pragma mark - UITableView Methods
 
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return [NSString stringWithFormat:@"Meta Data"];
+}
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [self.nemoNewContainer.metaData count];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    NSDictionary *metaData = [self.nemoNewContainer metaData];
+    NSArray *metaDataKeys = [metaData allKeys];
+    NMLog(@"Debug: meta Data: %@", metaData);
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MetaData"];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"MetaData"];
+    }
+    
+    [[cell textLabel] setText:@"Add Meta Data"];
+    [[cell textLabel] setTextColor:[UIColor colorWithRed:50.0f/256.0f green:100.0f/256.0f blue:1.0f alpha:1.0f]];
+    [[cell textLabel] setFont:[UIFont fontWithName:@"Arial-Bold" size:10.0]];
+    
+    /** Self define new accessory type **/
+    
+    [cell setAccessoryType:UITableViewCellAccessoryNone];
+    return cell;
+}
+
+/** If one row is selected the detail view pops from right
+ *  Using a navigationcontroller to controll NemoContainerDetailViewController
+ *  and the root controller
+ */
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewCellEditingStyleInsert;
+}
+
+/** Delete the container while left moving tableviewcell
+ *  Container could not be delete unless there is no object
+ *  in the container
+ */
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    NSMutableArray *metaDataKeys = [NSMutableArray arrayWithArray:[self.nemoNewContainer.metaData allKeys]];
+    
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        
+        [self.nemoNewContainer.metaData removeObjectForKey:[metaDataKeys objectAtIndex:[indexPath row]]];
+        
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation: UITableViewRowAnimationFade];
+        
+    }
+    if (editingStyle == UITableViewCellEditingStyleInsert) {
+        
+        NMLog(@"Debug: Line %d: %s in %s", __LINE__, __func__, __FILE__);
+        
+        NSString *key = @"X-Container-Meta-Test1";
+        // Copy the original meta data dictionary for judging if new row
+        // needs to be inserted after set meta data
+        NSMutableDictionary *tempMeta = [self.nemoNewContainer.metaData copy];
+        
+        if (self.nemoNewContainer.metaData) {
+            [self.nemoNewContainer.metaData setObject:@"invalid" forKey:key];
+        }
+        // If the key has been in meta data dictionary, the insertion becomes update
+        // So do not inser a new row here. Because the number of row in section is
+        // equal to the count of container.MetaData key-value paris
+        if (![tempMeta valueForKey:key])
+            [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+    }
+    
+}
 
 @end

@@ -14,7 +14,7 @@
 #define NEMO_DEBUG
 
 //static NSString const *proxyUrl = @"http://192.168.1.106:8080";
-static NSString const *proxyUrl = @"http://172.16.218.129:8080";
+static NSString const *proxyUrl = @"http://172.16.218.130:8080";
 //static NSString const *proxyUrl = @"http://9.123.245.246:8080";
 
 @implementation NemoClient
@@ -185,17 +185,18 @@ static id client = nil;
     [self setResponseSerializer:jsonSerializer];
     task = [self GET:self.storageUrl parameters:@{@"format": @"json"} success:^(NSURLSessionDataTask *task, id responseObject) {
         
-        /* Init container list  here */
+        /* Lazy init container list  here */
         self.containerList = [[NSMutableArray alloc] init];
         
         for (NSDictionary *con in (NSArray*)responseObject) {
             /** Initialize NemoContainer instance with container name 
              *  and then add to container list of the account 
              */
+            
             NemoContainer *container = [[NemoContainer alloc] initWithContainerName:con[@"name"] withMetaData:nil];
             [self.containerList addObject:container];
         }
-        NMLog(@"Debug response: %@", [task response]);
+        NMLog(@"Debug response: %@", task.response);
         NMLog(@"Debug resopnseObject: %@", responseObject);
         if (successHandler) {
             successHandler(self.containerList, nil);
@@ -240,7 +241,7 @@ static id client = nil;
         NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
         NMLog(@"Debug HEAD %@", container.containerName);
         NMLog(@"Debug header: %@", header);
-        [container setMetaData:header];
+        [container setMetaData:(NSMutableDictionary *)header];
         if (success) {
             success(container, nil);
         }
@@ -257,6 +258,7 @@ static id client = nil;
 {
     
     NMLog(@"Debug GET Container: %@", container.containerName);
+    
     
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
@@ -283,14 +285,44 @@ static id client = nil;
         NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
         NSMutableArray *tmpObjects = (NSMutableArray *)responseObject;
         for (NSDictionary *dic in tmpObjects) {
-            NMLog(@"Debug: dic is %@", dic);
-            NemoObject *newObj = [[NemoObject alloc] initWithObjectName:dic[@"name"] imageType:nil andMetaData:nil];
+            NMLog(@"Debug: %s line %d in func: %s\n object is %@", __FILE__, __LINE__, __func__, dic);
+            NemoObject *newObj = [[NemoObject alloc] initWithObjectName:dic[@"name"] fileExtension:@"file" andMetaData:nil];
             if (newObj) {
+                BOOL needToAdd = YES;
                 [newObj setSize:dic[@"bytes"]];
                 [newObj setContentType:dic[@"content_type"]];
                 [newObj setEtag:dic[@"hash"]];
-                [newObj setLastUpdated:dic[@"last_modified"]];
-                [container.objectList addObject:newObj];
+                [newObj setLastModified:dic[@"last_modified"]];
+                [newObj setMasterContainer:container];
+                
+                /* lazy intialize object list of container 
+                 * in container's first GET operation
+                 */
+                if (!container.objectList)
+                    container.objectList = [[NSMutableArray alloc] init];
+                else {
+                    if ([container.objectList count] > 0) {
+                        /** Obj will be put into obj list only when
+                         *  1. The object name is fresh, means new object
+                         *  2. The object name is old, means old object
+                         *     2.1 Etag is modified
+                         *     2.2 last_modified is updated
+                         */
+                        for (NemoObject *obj in container.objectList) {
+                            if ([obj.objectName isEqualToString:newObj.objectName]) {
+                                // The object is already in Object list
+                                // Check if has been updated
+                                if ([obj.lastModified isEqualToString:newObj.lastModified] &&
+                                    [obj.etag isEqualToString:newObj.etag])
+                                {
+                                    needToAdd = NO;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                (needToAdd == YES)?[container.objectList addObject:newObj]:NMLog(@"%@ is already in objList", newObj.objectName);
             }
         }
         NMLog(@"Debug: GET %@", container.containerName);
