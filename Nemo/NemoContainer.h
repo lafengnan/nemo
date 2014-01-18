@@ -19,7 +19,7 @@ typedef NS_ENUM(NSInteger, NemoContainerMetaDataType) {
     NemoContainerMetaDataTypeProduct
 };
 
-@interface NemoContainer : NSObject
+@interface NemoContainer : NSObject <NSCopying>
 
 #pragma mark - Properties
 

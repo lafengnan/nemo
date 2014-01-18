@@ -30,6 +30,8 @@
     return self;
 }
 
+#pragma mark - Instance Methods
+
 - (BOOL)isEqualToContainer:(NemoContainer *)destContainer
 {
     BOOL rc = NO;
@@ -39,6 +41,21 @@
         }
     }
     return rc;
+}
+
+/** Make NemoContainer instance copyable by using deep copying
+ *  @param zone
+ */
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    NemoContainer *container = [[self class] allocWithZone:zone];
+    
+    [container setContainerName:[containerName copy]];
+    [container setMetaData:[metaData copy]];
+    [container setObjectList:[objectList copy]];
+    
+    return container;
 }
 
 @end

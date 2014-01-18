@@ -235,22 +235,46 @@
      */
     NemoClient *client = [NemoClient getClient];
     
+    /** To updat object list, client needs to update as
+     *  1. GET account 
+     *  2. HEAD all containers
+     *  3. GET the container to update
+     */
     if (client) {
         NMLog(@"Debug: %s Line %d in function: %s\n", __FILE__, __LINE__, __func__);
         NMLog(@"Debug: object list: %@", self.objectList);
-        for (NemoContainer *eachContainer in client.containerList) {\
-            NMLog(@"Debug: %s -- line:%d in function: %s\n, container: %@", __FILE__, __LINE__, __func__, eachContainer.containerName);
-            NMLog(@"Debug: Object List: %@", eachContainer.objectList);
-            if ([eachContainer.objectList count] > 0) {
-                [client nemoGetContainer:eachContainer success:^(NemoContainer *container, NSError *jsonError) {
-                    if ([[client.containerList lastObject] isEqualToContainer:eachContainer]) {
-                        [self.tableView reloadData];
-                    }
+        [self.objectList removeAllObjects]; // clean object list firstly
+        
+        [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
+            NMLog(@"Debug: GET Account successful");
+            /* Do HEAD operation here to display cell detail lable */
+            for (NemoContainer *eachContainer in containers) {
+                [client nemoHeadContainer:eachContainer success:^(NemoContainer *container, NSError *jsonError) {
+                    NMLog(@"container: %@", container.containerName);
+                    NMLog(@"tableviw did load--->HEAD: %@", container.metaData);
+                    
+                    // Do GET Container Here
+                    NMLog(@"Debug: %s -- line:%d in function: %s\n, container: %@", __FILE__, __LINE__, __func__, eachContainer.containerName);
+                    NMLog(@"Debug: Object List: %@", eachContainer.objectList);
+                    [client nemoGetContainer:eachContainer success:^(NemoContainer *container, NSError *jsonError) {
+                        
+                        [self.objectList addObjectsFromArray:container.objectList];
+                        if ([[client.containerList lastObject] isEqualToContainer:container]) {
+                            [self.tableView reloadData];
+                        }
+                    } failure:^(NSURLSessionTask *task, NSError *error) {
+                        ;
+                    }];
+                    
                 } failure:^(NSURLSessionTask *task, NSError *error) {
                     ;
                 }];
+                
             }
-        }
+
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            ;
+        }];
         
     }
     

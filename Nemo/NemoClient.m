@@ -192,7 +192,6 @@ static id client = nil;
             /** Initialize NemoContainer instance with container name 
              *  and then add to container list of the account 
              */
-            
             NemoContainer *container = [[NemoContainer alloc] initWithContainerName:con[@"name"] withMetaData:nil];
             [self.containerList addObject:container];
         }
@@ -257,8 +256,7 @@ static id client = nil;
 - (void)nemoGetContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
 {
     
-    NMLog(@"Debug GET Container: %@", container.containerName);
-    
+    __block NemoContainer *oldContainer = [container copy];
     
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
@@ -277,12 +275,13 @@ static id client = nil;
     
     NSString *getURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, container.containerName];
     
-    
-    NMLog(@"Debug GET URL: %@", getURLString);
+    NMLog(@"Debug GET Container: %@", container.containerName);
     
     task = [self GET:getURLString parameters:@{@"format":@"json"} success:^(NSURLSessionDataTask *task, id responseObject) {
         
         NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
+        [container setMetaData:(NSMutableDictionary *)header];
+        
         NSMutableArray *tmpObjects = (NSMutableArray *)responseObject;
         for (NSDictionary *dic in tmpObjects) {
             NMLog(@"Debug: %s line %d in func: %s\n object is %@", __FILE__, __LINE__, __func__, dic);
@@ -301,6 +300,18 @@ static id client = nil;
                 if (!container.objectList)
                     container.objectList = [[NSMutableArray alloc] init];
                 else {
+                    
+                    /** If object count is less than the one of last GET
+                     *  there was/were object(s) DELETED in swift server
+                     *  side. In this case, container's object list needs
+                     *  to be reset, other wise the non-first time GET 
+                     *  operation will not get correct object List
+                     */
+                    if ([[oldContainer.metaData objectForKey:@"X-Container-Object-Count" ] intValue] >
+                        [[container.metaData objectForKey:@"X-Container-Object-Count" ] intValue]) {
+                        [container.objectList removeAllObjects];
+                        oldContainer = [container copy]; // Sync the oldContainer to be latest
+                    }
                     if ([container.objectList count] > 0) {
                         /** Obj will be put into obj list only when
                          *  1. The object name is fresh, means new object
