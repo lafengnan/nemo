@@ -213,7 +213,16 @@
             [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation: UITableViewRowAnimationFade];
             ;
         } failure:^(NSURLSessionTask *task, NSError *error) {
-            ;
+            /* Container could not be deleted if it has objects
+             * status code 409 returned if delete an nonempty container
+             */
+            if ([(NSHTTPURLResponse *)[task response] statusCode] == 409) {
+                NMLog(@"Debug: Conflict happens while deleting %@", container.containerName);
+                NSString *msg = [NSString stringWithFormat:@"%@ is not empty, Deletion is forbidden!", container.containerName];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Failed!" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert show];
+            }
+            
         }];
         
     }

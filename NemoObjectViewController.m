@@ -49,7 +49,16 @@
 {
     [super viewDidLoad];
     
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
     NemoClient *client = [NemoClient getClient];
+    
+    // Clean object list firstly
+    [self.objectList count] > 0?[self.objectList removeAllObjects]:nil;
     
     NMLog(@"Debug: %s %d in function:%s", __FILE__, __LINE__, __func__);
     NMLog(@"Debug: client data: %@", client.containerList);
@@ -74,7 +83,7 @@
                     [self.tableView reloadData];
                 }
                 [updateIndicator stopAnimating];
-
+                
             } failure:^(NSURLSessionTask *task, NSError *error) {
                 ;
             }];
@@ -91,7 +100,6 @@
     }
     [_refreshHeaderView refreshLastUpdatedDate];
 
-    
 }
 
 //- (void)loadView
@@ -165,23 +173,32 @@
 {
     
     /* Get client and container which willbe edit */
-    __block NemoClient *client = [NemoClient getClient];
-    __block NemoContainer *container = self.objectList[indexPath.row];
+    NemoClient *client = [NemoClient getClient];
+    NemoObject *object = [self.objectList objectAtIndex:[indexPath row]];
+    NemoContainer *container = [object masterContainer];
+    
     
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         
         /* Send DELETE operation to Swift */
-        [client nemoDeleteContainer:container success:^(NemoContainer *container, NSError *jsonError) {
+        [client nemoDeleteObject:object fromContainer:container success:^(NemoContainer *container, NemoObject *object, NSError *error) {
+            NMLog(@"Debug: %s %d %s", __FILE__, __LINE__, __func__);
+            NMLog(@"Debug: %@ is deleted form %@", object.objectName, container.containerName);
+            [self.objectList removeObject:object];
+            [container.objectList removeObject:object];
+            [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation: UITableViewRowAnimationFade];
             
-            NMLog(@"Debug: Container: %@ has deleted!", container.containerName);
-            
-            /* Remove the container in container list and update UI */
-            [self.objectList removeObjectAtIndex:indexPath.row];
-            
-            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation: UITableViewRowAnimationFade];
-            ;
         } failure:^(NSURLSessionTask *task, NSError *error) {
-            ;
+            /** Object could not be deleted if it has already been deleted
+             *  by other client operations.
+             */
+            if ([(NSHTTPURLResponse *)[task response] statusCode] == 404) {
+                NMLog(@"Debug: The object: %@ is not existing in container: %@", object.objectName, container.containerName);
+                NSString *msg = [NSString stringWithFormat:@"%@ is not existing!", object.objectName];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Failed!" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert show];
+            }
+            
         }];
         
     }

@@ -255,9 +255,7 @@ static id client = nil;
 
 - (void)nemoGetContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
 {
-    
-    __block NemoContainer *oldContainer = [container copy];
-    
+
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
     
     AFHTTPRequestSerializer *reqSerializer = [[AFHTTPRequestSerializer alloc] init];
@@ -282,68 +280,46 @@ static id client = nil;
         NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
         [container setMetaData:(NSMutableDictionary *)header];
         
+        
         NSMutableArray *tmpObjects = (NSMutableArray *)responseObject;
-        for (NSDictionary *dic in tmpObjects) {
-            NMLog(@"Debug: %s line %d in func: %s\n object is %@", __FILE__, __LINE__, __func__, dic);
-            NemoObject *newObj = [[NemoObject alloc] initWithObjectName:dic[@"name"] fileExtension:@"file" andMetaData:nil];
-            if (newObj) {
-                BOOL needToAdd = YES;
-                [newObj setSize:dic[@"bytes"]];
-                [newObj setContentType:dic[@"content_type"]];
-                [newObj setEtag:dic[@"hash"]];
-                [newObj setLastModified:dic[@"last_modified"]];
-                [newObj setMasterContainer:container];
+        
+        /* The following code needs optimization, TBD */
+        
+        if (tmpObjects) {
+            
+            NMLog(@"Debug: %s line %d in func: %s\n objects are %@", __FILE__, __LINE__, __func__, tmpObjects);
+            NMLog(@"Debug: GET %@", container.containerName);
+            NMLog(@"Debug: header: %@", header);
+            
+            /* lazy intialize object list of container in container's first GET operation */
+            container.objectList = !container.objectList?[[NSMutableArray alloc] init]:container.objectList;
+            
+            // If not first GET operation, clean the old object list
+            (container.objectList.count > 0)?[container.objectList removeAllObjects]:nil;
+    
+            for (NSDictionary *dic in tmpObjects) {
                 
-                /* lazy intialize object list of container 
-                 * in container's first GET operation
-                 */
-                if (!container.objectList)
-                    container.objectList = [[NSMutableArray alloc] init];
-                else {
+                NemoObject *newObj = [[NemoObject alloc] initWithObjectName:dic[@"name"] fileExtension:@"file" andMetaData:nil];
+                if (newObj) {
+                    [newObj setSize:dic[@"bytes"]];
+                    [newObj setContentType:dic[@"content_type"]];
+                    [newObj setETag:dic[@"hash"]];
+                    [newObj setLastModified:dic[@"last_modified"]];
+                    [newObj setMasterContainer:container];
                     
-                    /** If object count is less than the one of last GET
-                     *  there was/were object(s) DELETED in swift server
-                     *  side. In this case, container's object list needs
-                     *  to be reset, other wise the non-first time GET 
-                     *  operation will not get correct object List
-                     */
-                    if ([[oldContainer.metaData objectForKey:@"X-Container-Object-Count" ] intValue] >
-                        [[container.metaData objectForKey:@"X-Container-Object-Count" ] intValue]) {
-                        [container.objectList removeAllObjects];
-                        oldContainer = [container copy]; // Sync the oldContainer to be latest
-                    }
-                    if ([container.objectList count] > 0) {
-                        /** Obj will be put into obj list only when
-                         *  1. The object name is fresh, means new object
-                         *  2. The object name is old, means old object
-                         *     2.1 Etag is modified
-                         *     2.2 last_modified is updated
-                         */
-                        for (NemoObject *obj in container.objectList) {
-                            if ([obj.objectName isEqualToString:newObj.objectName]) {
-                                // The object is already in Object list
-                                // Check if has been updated
-                                if ([obj.lastModified isEqualToString:newObj.lastModified] &&
-                                    [obj.etag isEqualToString:newObj.etag])
-                                {
-                                    needToAdd = NO;
-                                }
-                                break;
-                            }
-                        }
-                    }
+                    [container.objectList addObject:newObj];
                 }
-                (needToAdd == YES)?[container.objectList addObject:newObj]:NMLog(@"%@ is already in objList", newObj.objectName);
             }
+
+          
         }
-        NMLog(@"Debug: GET %@", container.containerName);
-        NMLog(@"Debug: header: %@", header);
-        NMLog(@"Debug: object List: %@", container.objectList);
+     
         if (success) {
             success(container, nil);
         }
 
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        NMLog(@"Debug: GET container: %@ failed!", container.containerName);
         if (failure) {
             failure(task, error);
         }
@@ -392,14 +368,17 @@ static id client = nil;
         }
         ;
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        ;
+        NMLog(@"Debug: PUT container: %@ failed!", newContainer.containerName);
+        if (failureHandler) {
+            failureHandler(task, error);
+        }
     }];
     
     [task resume];
     
 }
 
-- (void)nemoDeleteContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
+- (void)nemoDeleteContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NSError *))successHandler failure:(void (^)(NSURLSessionTask *, NSError *))failureHandler
 {
     NMLog(@"Debug Delete container: %@", container.containerName);
     
@@ -424,9 +403,9 @@ static id client = nil;
         NMLog(@"Debug: Delete container: %@ Successfully!", container.containerName);
         NMLog(@"Debug: response: %@", [task response]);
         NMLog(@"Debug: response Obj: %@", responseObject);
-        
-        if (success) {
-            success(container, nil);
+        [self.containerList removeObject:container];
+        if (successHandler) {
+            successHandler(container, nil);
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
@@ -440,31 +419,23 @@ static id client = nil;
          */
         if ([(NSHTTPURLResponse*)[task response] statusCode] == 401) {
             NMLog(@"Debug: authenticated while deleteing: %@", container.containerName);
-            NMLog(@"Re-auth again");
+            NMLog(@"Debug: Re-auth again");
             [self authentication:@"tmpAuth" success:^(UIViewController *vc) {
-                [self nemoDeleteContainer:container success:^(NemoContainer *container, NSError *jsonError) {
-                    ;
-                } failure:^(NSURLSessionTask *task, NSError *error) {
-                    ;
-                }];
+                [self nemoDeleteContainer:container success:successHandler failure:failureHandler];
             } failure:^(UIViewController *vc, NSError *err) {
-                ;
+                /* If authentication failed, we will retry 10 times */
+                NMLog(@"Debug: Authentication Failed!Retry!");
+                for (int i = 0; i < 10; i++) {
+                    NMLog(@"Debug: Successed at %d retries", i);
+                    [self nemoDeleteContainer:container success:successHandler failure:failureHandler];
+                    break;
+                }
             }];
         }
         
-        /* Container could not be deleted if it has objects 
-         * status code 409 returned if delete an nonempty container
-         */
-        if ([(NSHTTPURLResponse *)[task response] statusCode] == 409) {
-            NMLog(@"Debug: Conflict happens while deleting %@", container.containerName);
-            NSString *msg = [NSString stringWithFormat:@"%@ is not empty, Deletion is forbidden!", container.containerName];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Failed!" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-            [alert show];
-        }
-        
-        if (failure) {
-            
-            failure(task, error);
+        if (failureHandler) {
+            NMLog(@"Debug: DELETE container: %@ failed!", container.containerName);
+            failureHandler(task, error);
         }
         
     }];
@@ -472,6 +443,73 @@ static id client = nil;
     [task resume];
     
 }
+
+#pragma mark - OpenStack/Swift Object HTTP RESTful API operations
+
+- (void)nemoDeleteObject:(NemoObject *)object fromContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NemoObject *, NSError *))successHandler failure:(void (^)(NSURLSessionTask *, NSError *))failureHandler
+{
+    NMLog(@"Debug: %s %d %s", __FILE__, __LINE__, __func__);
+    NMLog(@"Debug: Delete object: %@ from container: %@", object.objectName, container.containerName);
+    
+    NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
+    
+    AFHTTPRequestSerializer *reqSerializer = [[AFHTTPRequestSerializer alloc] init];
+    [self setRequestSerializer:reqSerializer];
+    
+    AFHTTPResponseSerializer *resSerializer = [[AFHTTPResponseSerializer alloc] init];
+    [resSerializer setAcceptableStatusCodes:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(200, 99)]];
+    [self setResponseSerializer:resSerializer];
+    if (self.authenticated) {
+        [self setHttpHeader:@{@"X-Auth-Token": self.authToken}];
+    }
+    AFJSONResponseSerializer *jsonSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:0];
+    [self setResponseSerializer:jsonSerializer];
+    
+    NSString *deleteURLString = [NSString stringWithFormat:@"%@/%@/%@", self.storageUrl, container.containerName, object.objectName];
+    
+    task = [self DELETE:deleteURLString parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        NMLog(@"Debug: Delete object: %@ from container: %@ Successfully!", object.objectName, container.containerName);
+        NMLog(@"Debug: response: %@", [task response]);
+        NMLog(@"Debug: response Obj: %@", responseObject);
+        [container.objectList removeObject:object];
+        if (successHandler) {
+            successHandler(container, object, nil);
+        }
+
+        ;
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        NMLog(@"Debug: Delete object: %@ from container: %@ Failed!", object.objectName, container.containerName);
+        NMLog(@"Debug: response: %@", [task response]);
+        NMLog(@"Debug: error: %@", error);
+        
+        /* Container could not be deleted if authentication expired
+         * status code 401 returned if need re-authentication
+         */
+        if ([(NSHTTPURLResponse*)[task response] statusCode] == 401) {
+            NMLog(@"Debug: authenticated while deleteing object: %@ from container: %@", object.objectName, container.containerName);
+            NMLog(@"Debug: Re-auth again");
+            [self authentication:@"tmpAuth" success:^(UIViewController *vc) {
+                [self nemoDeleteObject:object fromContainer:container success:successHandler failure:failureHandler];
+            } failure:^(UIViewController *vc, NSError *err) {
+                /* If authentication failed, we will retry 10 times */
+                NMLog(@"Debug: Authentication Failed!Retry!");
+                for (int i = 0; i < 10; i++) {
+                    NMLog(@"Debug: Successed at %d retries", i);
+                    [self nemoDeleteObject:object fromContainer:container success:successHandler failure:failureHandler];
+                    break;
+                }
+            }];
+        }
+       
+        if (failureHandler) {
+            failureHandler(task, error);
+        }
+
+    }];
+
+}
+
 
 #pragma mark -
 

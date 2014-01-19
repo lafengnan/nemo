@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class NemoContainer;
+@class NemoContainer, NemoObject;
 
 @interface NemoClient : AFHTTPSessionManager
 
@@ -86,23 +86,25 @@
  */
 - (void)nemoPutContainer:(NemoContainer *)newContainer success:(void (^)(NemoContainer *newContainer, NSError *error))successHandler failure:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
 
-/** Delete container of the specified container name
- *  @param containerName the container name of the container to delete
+/** Delete container of the specified container
+ *  @param container the container to delete
  *  @param successHandler executes if successful
  *  @param failureHandler executes if failed
  */
-- (void)nemoDeleteContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
+- (void)nemoDeleteContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NSError *jsonError))successHandler failure:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
 
 #pragma mark - Object Operations
-/*
 
-- (void)nemoPutPath:(NSString *)path container:(NSString *)con object:(NSString *)obj;
-- (void)nemoPostPath:(NSString *)path container:(NSString *)con object:(NSString *)obj;
 
-- (void)nemoHeadContainer:(NSString *)con object:(NSString *)obj;
-- (void)nemoDeleteContainer:(NSString *)con object:(NSString *)obj;
- 
+/** Delete Object of the sepcified object
+ *  @param object the object to delete
+ *  @param container the container which contains the object
+ *  @param successHandler executes if successful
+ *  @param failureHandler executes if failed
  */
+
+- (void)nemoDeleteObject:(NemoObject *)object fromContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NemoObject *object, NSError *error))successHandler failure:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
+ 
 
 #pragma mark - 
 

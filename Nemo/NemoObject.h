@@ -16,7 +16,7 @@
 
 @property (nonatomic, retain) NSString *objectName;
 @property (nonatomic, retain) NSString *size;
-@property (nonatomic, retain) NSString *etag;
+@property (nonatomic, retain) NSString *eTag;
 @property (nonatomic, retain) NSString *lastModified;
 @property (nonatomic, retain) NSString *contentType;
 @property (nonatomic, retain) NSString *fileExtension;

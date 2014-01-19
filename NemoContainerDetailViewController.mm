@@ -47,7 +47,7 @@
         // Add QR Code Image here
         UIImage *qrcodeImage = [self generateQRImageWithContainer:con];
         
-//        CGRect qrcodeImageViewFrame = CGRectMake(35, 250, 100.0, 100.0);
+        // CGRect qrcodeImageViewFrame = CGRectMake(35, 250, 100.0, 100.0);
         CGRect qrcodeImageViewFrame = CGRectMake(35, 360, 100.0, 100.0);
         [qrcodeImageView setFrame:qrcodeImageViewFrame];
         
@@ -55,16 +55,13 @@
         
         [[self navigationItem] setTitle:self.container.containerName];
         
-        // Get Object List if object count > 0
-        if ([self.container.metaData[@"X-Container-Object-Count"] intValue] > 0) {
-            // Lazy init object list here
-            self.container.objectList = [[NSMutableArray alloc] init];
-            [client nemoGetContainer:self.container success:^(NemoContainer *container, NSError *jsonError) {
-                [self.objectTableView reloadData];
-            } failure:^(NSURLSessionTask *task, NSError *error) {
-                ;
-            }];
-        }
+        // Lazy init object list here
+        self.container.objectList = [[NSMutableArray alloc] init];
+        [client nemoGetContainer:self.container success:^(NemoContainer *container, NSError *jsonError) {
+            [self.objectTableView reloadData];
+        } failure:^(NSURLSessionTask *task, NSError *error) {
+            ;
+        }];
         [self.view setNeedsDisplay];
     } failure:^(NSURLSessionTask *task, NSError *error) {
         ;
