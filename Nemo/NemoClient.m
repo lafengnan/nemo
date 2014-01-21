@@ -185,6 +185,7 @@ static id client = nil;
     [self setResponseSerializer:jsonSerializer];
     task = [self GET:self.storageUrl parameters:@{@"format": @"json"} success:^(NSURLSessionDataTask *task, id responseObject) {
         
+        NMLog(@"Debug: %s %d %s", __FILE__, __LINE__, __func__);
         /* Lazy init container list  here */
         self.containerList = [[NSMutableArray alloc] init];
         
@@ -195,6 +196,7 @@ static id client = nil;
             NemoContainer *container = [[NemoContainer alloc] initWithContainerName:con[@"name"] withMetaData:nil];
             [self.containerList addObject:container];
         }
+        
         NMLog(@"Debug response: %@", task.response);
         NMLog(@"Debug resopnseObject: %@", responseObject);
         if (successHandler) {
@@ -272,10 +274,11 @@ static id client = nil;
     [self setResponseSerializer:jsonSerializer];
     
     NSString *getURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, container.containerName];
+    NSDictionary *queryString = @{@"format":@"json", @"delimiter":@"/"};
     
     NMLog(@"Debug GET Container: %@", container.containerName);
     
-    task = [self GET:getURLString parameters:@{@"format":@"json"} success:^(NSURLSessionDataTask *task, id responseObject) {
+    task = [self GET:getURLString parameters:queryString success:^(NSURLSessionDataTask *task, id responseObject) {
         
         NSDictionary *header = [(NSHTTPURLResponse *)[task response] allHeaderFields];
         [container setMetaData:(NSMutableDictionary *)header];
@@ -301,10 +304,18 @@ static id client = nil;
                 
                 NemoObject *newObj = [[NemoObject alloc] initWithObjectName:dic[@"name"] fileExtension:@"file" andMetaData:nil];
                 if (newObj) {
-                    [newObj setSize:dic[@"bytes"]];
-                    [newObj setContentType:dic[@"content_type"]];
-                    [newObj setETag:dic[@"hash"]];
-                    [newObj setLastModified:dic[@"last_modified"]];
+                    if (!dic[@"name"]) {
+                        // Returns object as {subdir = "pods/";} means there is a dir
+                        [newObj setObjectName:[(NSString *)dic[@"subdir"] stringByDeletingPathExtension]];
+                        [newObj setFileExtension:@"folder"];
+                    }
+                    else{
+                        [newObj setSize:dic[@"bytes"]];
+                        [newObj setContentType:dic[@"content_type"]];
+                        [newObj setETag:dic[@"hash"]];
+                        [newObj setLastModified:dic[@"last_modified"]];
+                    }
+                    
                     [newObj setMasterContainer:container];
                     
                     [container.objectList addObject:newObj];

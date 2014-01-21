@@ -195,10 +195,11 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ObjectList"];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ObjectList"];
-        [cell.imageView setImage:[UIImage imageNamed:@"file_32.png"]];
-        if ([[NSString stringWithFormat:@"%@", object.size] isEqualToString:@"0"]) {
+        if ([[[container.objectList objectAtIndex:[indexPath row]] fileExtension] isEqualToString:@"folder"]) {
             [cell.imageView setImage:[UIImage imageNamed:@"folder.png"]];
         }
+        else
+            [cell.imageView setImage:[UIImage imageNamed:@"file_32.png"]];
     }
    
     [[cell textLabel] setText:[object objectName]];

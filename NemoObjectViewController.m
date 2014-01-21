@@ -49,11 +49,30 @@
 {
     [super viewDidLoad];
     
+    if (_refreshHeaderView == nil) {
+        EGORefreshTableHeaderView *view1 =
+        [[EGORefreshTableHeaderView alloc]initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height)];
+        view1.delegate = self;
+        // Add self defined view to tablview
+        [self.tableView addSubview:view1];
+        _refreshHeaderView = view1;
+    }
+    [_refreshHeaderView refreshLastUpdatedDate];
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    /** Draw activity indicator view for HEAD operation **/
+    CGRect frame = CGRectMake(150.0f, 220.0f, 37.0f, 37.0f);
+    
+    UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithFrame:frame];
+    [updateIndicator setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleGray];
+    [self.tableView addSubview:updateIndicator];
+    [updateIndicator startAnimating];
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
     NemoClient *client = [NemoClient getClient];
     
@@ -70,35 +89,22 @@
             [client nemoGetContainer:eachContainer success:^(NemoContainer *container, NSError *jsonError) {
                 
                 NMLog(@"Debug: %s--%d: %s GET Container Successed!", __FILE__, __LINE__, __func__);
-                
-                UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-                [self.tableView addSubview:updateIndicator];
-                [updateIndicator startAnimating];
                 NMLog(@"Debug: Object List: %@ of container: %@", container.objectList, container.containerName);
                 [self.objectList addObjectsFromArray:container.objectList];
-                if ([eachContainer.containerName isEqualToString:[[client.containerList lastObject] containerName]]) {
-                    NMLog(@"Debug: %s--%d: %s last container: %@ in container List: %@", __FILE__, __LINE__, __func__,
-                          eachContainer, client.containerList);
-                    NMLog(@"Debug: %s--%d: %s total Object List: %@", __FILE__, __LINE__, __func__, self.objectList);
+                if ([eachContainer isEqualToContainer:client.containerList.lastObject]) {
+                    NMLog(@"Debug: last container: %@ in container List: %@", eachContainer, client.containerList);
+                    NMLog(@"Debug: total Object List: %@", self.objectList);
+                    [updateIndicator stopAnimating];
+                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
                     [self.tableView reloadData];
                 }
-                [updateIndicator stopAnimating];
+                
                 
             } failure:^(NSURLSessionTask *task, NSError *error) {
                 ;
             }];
         }
     }
-    
-    if (_refreshHeaderView == nil) {
-        EGORefreshTableHeaderView *view1 =
-        [[EGORefreshTableHeaderView alloc]initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height)];
-        view1.delegate = self;
-        // Add self defined view to tablview
-        [self.tableView addSubview:view1];
-        _refreshHeaderView = view1;
-    }
-    [_refreshHeaderView refreshLastUpdatedDate];
 
 }
 
@@ -130,7 +136,12 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ObjectList"];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ObjectList"];
-        [cell.imageView setImage:[UIImage imageNamed:@"object_32.png"]];
+        if ([[[self.objectList objectAtIndex:[indexPath row]] fileExtension] isEqualToString:@"folder"]) {
+            [cell.imageView setImage:[UIImage imageNamed:@"folder.png"]];
+        }
+        else
+            [cell.imageView setImage:[UIImage imageNamed:@"file_32.png"]];
+        
     }
     
     NemoObject *object = [self.objectList objectAtIndex:[indexPath row]];

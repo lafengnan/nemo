@@ -49,59 +49,45 @@
 {
     [super viewWillAppear:animated];
     
-    /** Because after new container created, the meta data info has not
-     *  been update while pop from NemoNewContainerViewController, the
-     *  UI needs to invoke HEAD operation before reloading data again
-     */
     
-    NemoClient *client = [NemoClient getClient];
+    /** Draw activity indicator view for HEAD operation **/
+    CGRect frame = CGRectMake(150.0f, 220.0f, 37.0f, 37.0f);
     
-    for (NemoContainer *con in client.containerList) {
-        [client nemoHeadContainer:con success:^(NemoContainer *container, NSError *jsonError) {
-            
-            UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];              
-            [self.tableView addSubview:updateIndicator];
-            
-            [updateIndicator startAnimating];
-            [self.tableView reloadData];
-            [updateIndicator stopAnimating];
-        } failure:^(NSURLSessionTask *task, NSError *error) {
-            
-            NMLog(@"Update %@ Failed", con.containerName);
-            
-        }];
-    }
-
+    UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithFrame:frame];
+    [updateIndicator setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleGray];
+    [self.tableView addSubview:updateIndicator];
+    [updateIndicator startAnimating];
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    NMLog(@"table view did load");
     // 1. Get client instance
     NemoClient *client = [NemoClient getClient];
     // 2. display containers
     [client nemoGetAccount:^(NSArray *containers, NSError *jsonError) {
         /* Copy container list here */
-        [self setContainerList:(NSMutableArray *)containers];
-        UIActivityIndicatorView  *updateIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        [self.tableView addSubview:updateIndicator];
-        
-        [updateIndicator startAnimating];
+        [self setContainerList:[(NSMutableArray *)containers mutableCopy]];
+        NMLog(@"Debug: %s %d %s", __FILE__, __LINE__, __func__);
+        NMLog(@"Debug: container list is : %@", containerList);
+        NMLog(@"Debug: container list of client is : %@", client.containerList);
         /* Do HEAD operation here to display cell detail lable */
+        
+        /** 2014.1.21 notes:
+         *  Because multithreads are running concurrently, the last container
+         *  maybe returned ahead of other ones, and makes table reload data
+         *  uncorrectly, this need to fix. And the same issue exists in the 
+         *  same method of NemoObjectViewController.m
+         */
         for (NemoContainer *con in self.containerList) {
             [client nemoHeadContainer:con success:^(NemoContainer *container, NSError *jsonError) {
-                NMLog(@"container: %@", con.containerName);
-                NMLog(@"tableviw did load--->HEAD: %@", con.metaData);
+                NMLog(@"Debug: HEAD %@ successfully!", con.containerName);
+                NMLog(@"Debug: HEAD Meta Data: %@", con.metaData);
+                NMLog(@"Debug: Currenty Container is: %@", con);
+                NMLog(@"Debug: Last container is %@", containerList.lastObject);
                 
-                
-                if ([con.containerName isEqualToString:[(NemoContainer *)[self.containerList lastObject] containerName]]) {
-        
-                    [self.tableView reloadData];
+                if ([[client.containerList lastObject] isEqualToContainer:con]) {
                     [updateIndicator stopAnimating];
+                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+                    [self.tableView reloadData];
                 }
-                
                 
             } failure:^(NSURLSessionTask *task, NSError *error) {
                 ;
@@ -128,8 +114,15 @@
         
         displayTask(task);
     }];
+
     
-    if (_refreshHeaderView == nil) {
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    NMLog(@"table view did load");
+        if (_refreshHeaderView == nil) {
         EGORefreshTableHeaderView *view1 =
         [[EGORefreshTableHeaderView alloc]initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height)];
         view1.delegate = self;
@@ -282,13 +275,16 @@
         for (NemoContainer *con in self.containerList) {
             [client nemoHeadContainer:con success:^(NemoContainer *container, NSError *jsonError) {
                 
-            [self.tableView reloadData];
+                // Reload Data after last container HEAD operation completes
+                if ([con isEqualToContainer:containerList.lastObject]) {
+                    [self.tableView reloadData];
+                }
                 
             } failure:^(NSURLSessionTask *task, NSError *error) {
                 ;
             }];
         }
-
+        
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         
         NMLog(@"error %@", error);
@@ -308,7 +304,7 @@
         
         displayTask(task);
     }];
-
+    
     
     _reloading = YES;
 }
