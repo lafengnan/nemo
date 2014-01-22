@@ -7,6 +7,8 @@
 //
 
 #import "NemoObjectViewController.h"
+#import "NemoNewObjectViewController.h"
+#import "NemoObjectDetailViewController.h"
 #import "NemoClient.h"
 #import "NemoObject.h"
 #import "NemoContainer.h"
@@ -85,8 +87,11 @@
     NMLog(@"Debug: client data: %@", [[client.containerList objectAtIndex:0] objectList]);
     
     if (client) {
+        
+        NSDictionary *queryString = @{@"format": @"json", @"delimiter":@"/"};
+        
         for (NemoContainer *eachContainer in client.containerList) {
-            [client nemoGetContainer:eachContainer success:^(NemoContainer *container, NSError *jsonError) {
+            [client nemoGETContainer:eachContainer withQueryString:queryString success:^(NemoContainer *container, NSError *jsonError) {
                 
                 NMLog(@"Debug: %s--%d: %s GET Container Successed!", __FILE__, __LINE__, __func__);
                 NMLog(@"Debug: Object List: %@ of container: %@", container.objectList, container.containerName);
@@ -98,7 +103,6 @@
                     [[UIApplication sharedApplication] endIgnoringInteractionEvents];
                     [self.tableView reloadData];
                 }
-                
                 
             } failure:^(NSURLSessionTask *task, NSError *error) {
                 ;
@@ -192,7 +196,7 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         
         /* Send DELETE operation to Swift */
-        [client nemoDeleteObject:object fromContainer:container success:^(NemoContainer *container, NemoObject *object, NSError *error) {
+        [client nemoDELETEObject:object fromContainer:container success:^(NemoContainer *container, NemoObject *object, NSError *error) {
             NMLog(@"Debug: %s %d %s", __FILE__, __LINE__, __func__);
             NMLog(@"Debug: %@ is deleted form %@", object.objectName, container.containerName);
             [self.objectList removeObject:object];
@@ -234,14 +238,14 @@
  */
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-//    NemoContainerDetailViewController *containerDetailVc = [[NemoContainerDetailViewController alloc] init];
-//    
-//    NemoContainer *container = [containerList objectAtIndex:[indexPath row]];
-//    
-//    [containerDetailVc setContainer:container];
-//    
-//    [self.navigationController pushViewController:containerDetailVc animated:YES];
-//    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NemoObjectDetailViewController *objDetailVc = [[NemoObjectDetailViewController alloc] init];
+    
+    NemoObject *obj = [objectList objectAtIndex:[indexPath row]];
+    
+    [objDetailVc setObjInstance:obj];
+    
+    [self.navigationController pushViewController:objDetailVc animated:YES];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 
@@ -250,8 +254,8 @@
 
 - (IBAction)addNewObject:(id)sender
 {
-//   NemoNewContainerViewController *newVc = [[NemoNewContainerViewController alloc] init];
-//   [self.navigationController pushViewController:newVc animated:YES];
+    NemoNewObjectViewController *newVc = [[NemoNewObjectViewController alloc] init];
+   [self.navigationController pushViewController:newVc animated:YES];
 }
 
 
@@ -284,7 +288,7 @@
                     // Do GET Container Here
                     NMLog(@"Debug: %s -- line:%d in function: %s\n, container: %@", __FILE__, __LINE__, __func__, eachContainer.containerName);
                     NMLog(@"Debug: Object List: %@", eachContainer.objectList);
-                    [client nemoGetContainer:eachContainer success:^(NemoContainer *container, NSError *jsonError) {
+                    [client nemoGETContainer:eachContainer withQueryString:nil success:^(NemoContainer *container, NSError *jsonError) {
                         
                         [self.objectList addObjectsFromArray:container.objectList];
                         if ([[client.containerList lastObject] isEqualToContainer:container]) {

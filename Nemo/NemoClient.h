@@ -77,7 +77,7 @@
  *  @param successHandler executes if successful
  *  @param failureHandler executes if failed
  */
-- (void)nemoGetContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
+- (void)nemoGETContainer:(NemoContainer *)container withQueryString:(NSDictionary *)queryString success:(void (^)(NemoContainer *container, NSError *jsonError))success failure:(void (^)(NSURLSessionTask *task, NSError *error))failure;
 
 /** Put a new container into the account
  *  @param newContainer the container to add
@@ -93,6 +93,8 @@
  */
 - (void)nemoDeleteContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NSError *jsonError))successHandler failure:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
 
+
+
 #pragma mark - Object Operations
 
 
@@ -103,7 +105,35 @@
  *  @param failureHandler executes if failed
  */
 
-- (void)nemoDeleteObject:(NemoObject *)object fromContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NemoObject *object, NSError *error))successHandler failure:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
+- (void)nemoDELETEObject:(NemoObject *)object fromContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NemoObject *object, NSError *error))successHandler failure:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
+
+/** GET Object of the specified object
+ *  @param object the object to get
+ *  @param container the container which contains the object
+ *  @param successHandler executes if successufl
+ *  @param failuerHandler executes if failed
+ */
+
+- (void)nemoGETObject:(NemoObject *)object fromContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NemoObject * obj, NSError *error))successHandler failuer:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
+
+/** PUT object of the specified object
+ *  @param object the object to put
+ *  @param container the container where to put the object
+ *  @param successHandler executes if successful
+ *  @param failuerHandler executes if failed
+ */
+
+- (void)nemoPUTObject:(NemoObject *)object toContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NemoObject *obj, NSError *error))successHandler failuer:(void (^)(NSURLSessionTask *task, NSError *error))failuerHandler;
+
+/** HEAD object of the specified object
+ *  @param object the object to HEAD
+ *  @param container the container which contains the object
+ *  @param successHandler executes if successful
+ *  @param failuerHandler executes if failed
+ */
+
+- (void)nemoHEADObject:(NemoObject *)object fromContainer:(NemoContainer *)container success:(void (^)(NemoContainer *container, NemoObject *object, NSError *error))successHandler failuer:(void (^)(NSURLSessionTask *task, NSError *error))failureHandler;
+
  
 
 #pragma mark - 

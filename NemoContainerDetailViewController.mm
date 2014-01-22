@@ -57,7 +57,8 @@
         
         // Lazy init object list here
         self.container.objectList = [[NSMutableArray alloc] init];
-        [client nemoGetContainer:self.container success:^(NemoContainer *container, NSError *jsonError) {
+        NSDictionary *queryString = @{@"format": @"json", @"delimiter":@"/"};
+        [client nemoGETContainer:self.container withQueryString:queryString success:^(NemoContainer *container, NSError *jsonError) {
             [self.objectTableView reloadData];
         } failure:^(NSURLSessionTask *task, NSError *error) {
             ;

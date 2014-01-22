@@ -255,7 +255,7 @@ static id client = nil;
     [task resume];
 }
 
-- (void)nemoGetContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
+- (void)nemoGETContainer:(NemoContainer *)container withQueryString:(NSDictionary *)queryString success:(void (^)(NemoContainer *, NSError *))success failure:(void (^)(NSURLSessionTask *, NSError *))failure
 {
 
     NSURLSessionDataTask *task = [[NSURLSessionDataTask alloc] init];
@@ -274,9 +274,9 @@ static id client = nil;
     [self setResponseSerializer:jsonSerializer];
     
     NSString *getURLString = [NSString stringWithFormat:@"%@/%@", self.storageUrl, container.containerName];
-    NSDictionary *queryString = @{@"format":@"json", @"delimiter":@"/"};
     
-    NMLog(@"Debug GET Container: %@", container.containerName);
+    NMLog(@"Debug: GET Container: %@", container.containerName);
+    NMLog(@"Debug: query string: %@", queryString);
     
     task = [self GET:getURLString parameters:queryString success:^(NSURLSessionDataTask *task, id responseObject) {
         
@@ -302,12 +302,17 @@ static id client = nil;
     
             for (NSDictionary *dic in tmpObjects) {
                 
-                NemoObject *newObj = [[NemoObject alloc] initWithObjectName:dic[@"name"] fileExtension:@"file" andMetaData:nil];
+                __block NemoObject *newObj = [[NemoObject alloc] initWithObjectName:dic[@"name"] fileExtension:@"file" andMetaData:nil];
                 if (newObj) {
                     if (!dic[@"name"]) {
                         // Returns object as {subdir = "pods/";} means there is a dir
                         [newObj setObjectName:[(NSString *)dic[@"subdir"] stringByDeletingPathExtension]];
                         [newObj setFileExtension:@"folder"];
+                        // Lazy init subObjects here
+                        newObj.subObjects = !newObj.subObjects?[[NSMutableArray alloc] init]:newObj.subObjects;
+                         // Stores the sub objects of specified folder
+                        NSDictionary *newQueryString = @{@"format":@"json", @"delimiter":@"/", @"prefix":newObj.objectName};
+                        
                     }
                     else{
                         [newObj setSize:dic[@"bytes"]];
@@ -457,7 +462,8 @@ static id client = nil;
 
 #pragma mark - OpenStack/Swift Object HTTP RESTful API operations
 
-- (void)nemoDeleteObject:(NemoObject *)object fromContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NemoObject *, NSError *))successHandler failure:(void (^)(NSURLSessionTask *, NSError *))failureHandler
+
+- (void)nemoDELETEObject:(NemoObject *)object fromContainer:(NemoContainer *)container success:(void (^)(NemoContainer *, NemoObject *, NSError *))successHandler failure:(void (^)(NSURLSessionTask *, NSError *))failureHandler
 {
     NMLog(@"Debug: %s %d %s", __FILE__, __LINE__, __func__);
     NMLog(@"Debug: Delete object: %@ from container: %@", object.objectName, container.containerName);
@@ -487,9 +493,14 @@ static id client = nil;
         if (successHandler) {
             successHandler(container, object, nil);
         }
-
-        ;
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        
+        /** If the object is an subdir which is not a real object in 
+         *  in swift server side, we need to convert the fake object
+         *  name to the real one for deleteing, TBD
+         */
+        
+        
         NMLog(@"Debug: Delete object: %@ from container: %@ Failed!", object.objectName, container.containerName);
         NMLog(@"Debug: response: %@", [task response]);
         NMLog(@"Debug: error: %@", error);
@@ -501,13 +512,13 @@ static id client = nil;
             NMLog(@"Debug: authenticated while deleteing object: %@ from container: %@", object.objectName, container.containerName);
             NMLog(@"Debug: Re-auth again");
             [self authentication:@"tmpAuth" success:^(UIViewController *vc) {
-                [self nemoDeleteObject:object fromContainer:container success:successHandler failure:failureHandler];
+                [self nemoDELETEObject:object fromContainer:container success:successHandler failure:failureHandler];
             } failure:^(UIViewController *vc, NSError *err) {
                 /* If authentication failed, we will retry 10 times */
                 NMLog(@"Debug: Authentication Failed!Retry!");
                 for (int i = 0; i < 10; i++) {
                     NMLog(@"Debug: Successed at %d retries", i);
-                    [self nemoDeleteObject:object fromContainer:container success:successHandler failure:failureHandler];
+                    [self nemoDELETEObject:object fromContainer:container success:successHandler failure:failureHandler];
                     break;
                 }
             }];

@@ -21,6 +21,7 @@
 @property (nonatomic, retain) NSString *contentType;
 @property (nonatomic, retain) NSString *fileExtension;
 @property (nonatomic, retain) NSMutableDictionary *metaData;
+@property (nonatomic, retain) NSMutableArray *subObjects;     // For folder
 @property (nonatomic, weak) NemoContainer *masterContainer;
 
 

@@ -78,6 +78,10 @@
 		8FE6DAB9186DE2F8003E7EC0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FE6DAB8186DE2F8003E7EC0 /* CFNetwork.framework */; };
 		8FE6DABB186DE34F003E7EC0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FE6DABA186DE34F003E7EC0 /* SystemConfiguration.framework */; };
 		8FE6DABD186DE53E003E7EC0 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FE6DABC186DE53E003E7EC0 /* MobileCoreServices.framework */; };
+		8FF13631188F5C040014DA8F /* NemoObjectDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FF13630188F5C040014DA8F /* NemoObjectDetailViewController.m */; };
+		8FF13635188F6A5F0014DA8F /* NemoNewObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FF13633188F6A5F0014DA8F /* NemoNewObjectViewController.m */; };
+		8FF13636188F6A5F0014DA8F /* NemoNewObjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8FF13634188F6A5F0014DA8F /* NemoNewObjectViewController.xib */; };
+		8FF13639188F92BC0014DA8F /* NemoContainerSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FF13638188F92BC0014DA8F /* NemoContainerSelectorViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -195,6 +199,13 @@
 		8FE6DAB8186DE2F8003E7EC0 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		8FE6DABA186DE34F003E7EC0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		8FE6DABC186DE53E003E7EC0 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		8FF1362F188F5C040014DA8F /* NemoObjectDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoObjectDetailViewController.h; sourceTree = "<group>"; };
+		8FF13630188F5C040014DA8F /* NemoObjectDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoObjectDetailViewController.m; sourceTree = "<group>"; };
+		8FF13632188F6A5F0014DA8F /* NemoNewObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoNewObjectViewController.h; sourceTree = "<group>"; };
+		8FF13633188F6A5F0014DA8F /* NemoNewObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoNewObjectViewController.m; sourceTree = "<group>"; };
+		8FF13634188F6A5F0014DA8F /* NemoNewObjectViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NemoNewObjectViewController.xib; sourceTree = "<group>"; };
+		8FF13637188F92BC0014DA8F /* NemoContainerSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NemoContainerSelectorViewController.h; sourceTree = "<group>"; };
+		8FF13638188F92BC0014DA8F /* NemoContainerSelectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NemoContainerSelectorViewController.m; sourceTree = "<group>"; };
 		AB54B1D90977443B80A84621 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C34454302D164301B691B9DE /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -341,6 +352,13 @@
 				8F02C19E187AD9DA00F0A92A /* NemoContainerDetailViewController.xib */,
 				8F959E4818634D250096CED8 /* NemoObjectViewController.h */,
 				8F959E4918634D250096CED8 /* NemoObjectViewController.m */,
+				8FF13632188F6A5F0014DA8F /* NemoNewObjectViewController.h */,
+				8FF13633188F6A5F0014DA8F /* NemoNewObjectViewController.m */,
+				8FF13634188F6A5F0014DA8F /* NemoNewObjectViewController.xib */,
+				8FF13637188F92BC0014DA8F /* NemoContainerSelectorViewController.h */,
+				8FF13638188F92BC0014DA8F /* NemoContainerSelectorViewController.m */,
+				8FF1362F188F5C040014DA8F /* NemoObjectDetailViewController.h */,
+				8FF13630188F5C040014DA8F /* NemoObjectDetailViewController.m */,
 				8F5196B11861EE0200D997F3 /* HomePageViewController.h */,
 				8F5196B21861EE0200D997F3 /* HomePageViewController.m */,
 				8F5196B81861F54D00D997F3 /* HomePageViewController.xib */,
@@ -551,6 +569,7 @@
 				8F02C193187AC0CD00F0A92A /* container_64.png in Resources */,
 				8FA8B7C11879A414003EF3FD /* grayArrow.png in Resources */,
 				8FA8B7BE1879A414003EF3FD /* blackArrow@2x.png in Resources */,
+				8FF13636188F6A5F0014DA8F /* NemoNewObjectViewController.xib in Resources */,
 				8FA8B7C21879A414003EF3FD /* grayArrow@2x.png in Resources */,
 				8F02C195187AC16A00F0A92A /* container_32.png in Resources */,
 			);
@@ -616,7 +635,9 @@
 				8F9553F418671FCA00F432CF /* NemoClient.m in Sources */,
 				8FE6DAB2186DBD44003E7EC0 /* UIActivityIndicatorView+AFNetworking.m in Sources */,
 				8FE6DA9D186DBCDF003E7EC0 /* AFURLRequestSerialization.m in Sources */,
+				8FF13639188F92BC0014DA8F /* NemoContainerSelectorViewController.m in Sources */,
 				8F02C19F187AD9DA00F0A92A /* NemoContainerDetailViewController.mm in Sources */,
+				8FF13631188F5C040014DA8F /* NemoObjectDetailViewController.m in Sources */,
 				8FE6DAB1186DBD44003E7EC0 /* AFNetworkActivityIndicatorManager.m in Sources */,
 				8F692E401882B4F70087B229 /* NemoObject.m in Sources */,
 				8FE6DA9B186DBCDF003E7EC0 /* AFSecurityPolicy.m in Sources */,
@@ -628,6 +649,7 @@
 				8F5196B31861EE0200D997F3 /* HomePageViewController.m in Sources */,
 				8FE6DA99186DBCDF003E7EC0 /* AFHTTPSessionManager.m in Sources */,
 				8F959E4718634CBE0096CED8 /* NemoContainerViewController.m in Sources */,
+				8FF13635188F6A5F0014DA8F /* NemoNewObjectViewController.m in Sources */,
 				8FE6DA9A186DBCDF003E7EC0 /* AFNetworkReachabilityManager.m in Sources */,
 				8FE6DAB5186DBD44003E7EC0 /* UIImageView+AFNetworking.m in Sources */,
 				8FA8B7B01879A2F6003EF3FD /* EGORefreshTableHeaderView.m in Sources */,

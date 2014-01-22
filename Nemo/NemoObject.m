@@ -10,7 +10,7 @@
 #import "NemoContainer.h"
 
 @implementation NemoObject
-@synthesize objectName, fileExtension, metaData, size, eTag,lastModified, contentType, masterContainer;
+@synthesize objectName, fileExtension, metaData, size, eTag,lastModified, contentType, masterContainer, subObjects;
 
 
 #pragma mark - Initializer
