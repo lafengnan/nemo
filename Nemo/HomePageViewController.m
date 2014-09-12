@@ -14,6 +14,7 @@
 
 @interface HomePageViewController ()
 
+
 @end
 
 @implementation HomePageViewController
@@ -33,76 +34,87 @@
     return self;
 }
 
-#pragma mark - Delegate
+#pragma mark - Callback Blocks
 
+void (^authSuccessed)(UIViewController *hp) = ^(UIViewController *hp){
+    
+    [[(HomePageViewController *)hp loginIndicator] stopAnimating];  // Stop indicator
+    [[UIApplication sharedApplication] endIgnoringInteractionEvents]; // Reactive interaction
+    
+    UITabBarController *tabBarController = [[UITabBarController alloc] init];
+    
+    NemoContainerViewController *containerVc = [[NemoContainerViewController alloc] init];
+    NemoObjectViewController *objectVc = [[NemoObjectViewController alloc] init];
+    
+    UIViewController *settingVc = [[UIViewController alloc] init];
+    [[settingVc view] setBackgroundColor:[UIColor brownColor]];
+    [[settingVc tabBarItem] setTitle:@"Setting"];
+    
+    UINavigationController *containerNav = [[UINavigationController alloc] initWithRootViewController:containerVc];
+    
+    UINavigationController *objNav = [[UINavigationController alloc] initWithRootViewController:objectVc];
+    UINavigationController *setNav = [[UINavigationController alloc] initWithRootViewController:settingVc];
+    
+    NSArray *viewControllers = [NSArray arrayWithObjects:containerNav, objNav, setNav, nil];
+    
+    [tabBarController setViewControllers:viewControllers];
+    [hp presentViewController:tabBarController animated:YES completion:^(){
+        
+        NMLog(@"tabBar view controller loaded");
+    }];
+};
 
+void (^authFailed)(UIViewController *hp, NSError *err) = ^(UIViewController *hp, NSError *err){
+    
+    [[(HomePageViewController *)hp loginIndicator] stopAnimating];
+    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+    
+    UIAlertView *alert = [[UIAlertView alloc] init];
+    
+    if ([[err domain] isEqualToString:@"NSURLErrorDomain"]) {
+        
+        /** If the error description as below:
+         *  Error Domain = NSURLErrorDomain
+         *  Code = -1001
+         *  "The request timed out."
+         *  means the service is unavailabe
+         */
+        alert = [alert initWithTitle:@"Service Unavailabe" message:@"Time out, Please Check Networking Status" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    }
+    else if ([[err domain] isEqualToString:@"AFNetworkingErrorDomain"])
+    {
+        
+        NSHTTPURLResponse *response = err.userInfo[@"AFNetworkingOperationFailingURLResponseErrorKey"];
+        NMLog(@"HTTP URL Response: %@", response);
+        
+        NSInteger statusCode = [response statusCode];
+        
+        NSString *msg = [NSString stringWithString:[err localizedDescription]];
+        
+        if(statusCode == 401)
+            msg = @"Invalid User Name or Password";
+        
+        alert = [alert initWithTitle:@"Login Error" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    }
+    [alert show];
+};
+
+#pragma mark - UI Action
 
 - (IBAction)doLogin:(id)sender
 {
     
-    NSLog(@"doLogin");
+    NMLog(@"doLogin");
     [NemoClient initialize];
     NemoClient *client = [NemoClient getClient];
+    [client setDelegate:self];
     [client setUserName:[userName text]];
     [client setPassWord:[passKey text]];
+    [self.loginIndicator startAnimating];
     
-    dispatch_queue_t nemoAuthQueue = dispatch_queue_create("com.auth.nemo", DISPATCH_QUEUE_CONCURRENT);
-    dispatch_async(nemoAuthQueue, ^{
-        
-        [client authentication:@"tempAuth"];
-        
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            
-            double delayInSeconds = 2.0;
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-            
-            [self.loginIndicator startAnimating];
-            /** While indicator spinning, stop all interactive operations
-             */
-            [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
-            
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                
-                if (client.authenticated)
-                {
-                
-                    [self.loginIndicator stopAnimating];  // Stop indicator
-                    [[UIApplication sharedApplication] endIgnoringInteractionEvents]; // Reactive interaction
-                    
-                    UITabBarController *tabBarController = [[UITabBarController alloc] init];
-                    
-                    NemoContainerViewController *containerVc = [[NemoContainerViewController alloc] init];
-                    NemoObjectViewController *objectVc = [[NemoObjectViewController alloc] init];
-                    UIViewController *settingVc = [[UIViewController alloc] init];
-                    [[settingVc view] setBackgroundColor:[UIColor brownColor]];
-                    [[settingVc tabBarItem] setTitle:@"Setting"];
-                    
-                    UINavigationController *containerNav = [[UINavigationController alloc] initWithRootViewController:containerVc];
-                    [containerNav setTitle:@"Container List"];
-                    
-                    NSArray *viewControllers = [NSArray arrayWithObjects:containerNav, objectVc, settingVc, nil];
-                    
-                    [tabBarController setViewControllers:viewControllers];
-                    [self presentViewController:tabBarController animated:YES completion:^(){
-                        
-                    }];
-                }
-                else
-                {
-                    [self.loginIndicator stopAnimating];
-                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
-                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
-                    NSError *error = [[NSError alloc] initWithDomain:@"isUserInfoValid" code:1 userInfo:nil];
-                    
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid User or Password" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                    [alert show];
-                }
-            });
-            
-            
-        });
-        
-    });
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+    
+    [client authentication:@"tempAuth" success:authSuccessed failure:authFailed];
     
 }
 
@@ -173,7 +185,7 @@
 //    frame.origin.y +=120;
 //    frame.size.height -=120;
 //    self.view.frame = frame;
-    NSLog(@"textfield:%@", textField);
+    NMLog(@"textfield:%@", textField);
     //返回一个BOOL值，指明是否允许在按下回车键时结束编辑
     //如果允许要调用resignFirstResponder 方法，这回导致结束编辑，而键盘会被收起
     [textField resignFirstResponder];//查一下resign这个单词的意思就明白这个方法了

@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "EGORefreshTableHeaderView.h"
 
+@class NemoContainer;
+
 @interface NemoContainerViewController : UITableViewController <EGORefreshTableHeaderDelegate>
 {
     BOOL isflage;
@@ -19,9 +21,9 @@
 
 
 - (id)initWithContainerList:(NSArray *)containers;
-//- (void)reloadTableViewDataSource;
-//- (void)doneLoadingTableViewData;
 - (void)updateContainerList;
 - (void)doneUpdatingContainerList;
+
+- (IBAction)addNewContainer:(id)sender;
 
 @end

@@ -9,13 +9,32 @@
 #import <UIKit/UIKit.h>
 
 @class NemoContainer;
-@interface NemoContainerDetailViewController : UIViewController
+@interface NemoContainerDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
-@property (weak, nonatomic) IBOutlet UILabel *containerName;
+#pragma mark - Properties
+
+@property (weak, nonatomic) IBOutlet UILabel *bytesUsed;
 
 @property (weak, nonatomic) IBOutlet UILabel *objectCount;
 @property (weak, nonatomic) IBOutlet UILabel *createTimeStamp;
-@property (weak, nonatomic) IBOutlet UIImageView *containerImage;
+@property (weak, nonatomic) IBOutlet UIImageView *qrcodeImageView;
+@property (weak, nonatomic) IBOutlet UITableView *objectTableView;
 
 @property (retain, nonatomic) NemoContainer *container;
+
+#pragma mark - Instance methods
+
+/** Genereate QR Code Image for specified container
+ *  @param container which will be used to generate QR Code
+ */
+
+- (UIImage *)generateQRImageWithContainer:(NemoContainer *)container;
+
+#pragma mark - Deprecated methods
+
+- (UIImage *)generateQRImageWithContainer:(NSString *)containerName
+                                bytesUsed:(NSString *)bytes
+                              objectCount:(NSString *)cnt
+                                createdAt:(NSString *)timestamp;
+
 @end

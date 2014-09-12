@@ -8,18 +8,33 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NemoContainer : NSObject
+@class NemoObject;
+
+
+#pragma mark Enum
+
+typedef NS_ENUM(NSInteger, NemoContainerMetaDataType) {
+    NemoContainerMetaDataTypeRetention,
+    NemoContainerMetadataTypeTest,
+    NemoContainerMetaDataTypeProduct
+};
+
+@interface NemoContainer : NSObject <NSCopying>
 
 #pragma mark - Properties
 
 @property (nonatomic, retain) NSString *containerName;
-@property (nonatomic, retain) NSDate *createTimeStamp;
-@property (nonatomic, retain) NSArray *metaData;
+@property (nonatomic, retain) NSMutableDictionary *metaData;
+@property (nonatomic, retain) NSMutableArray *objectList;
 
 
 #pragma mark - Initializer
 
-- (id)initWithContainerName:(NSString *)name createAt:(NSDate *)timeStamp metaData:(NSArray *)meta;
+- (id)initWithContainerName:(NSString *)name withMetaData:(NSMutableDictionary *)meta;
 - (id)init;
+
+#pragma mark - Compare
+
+- (BOOL)isEqualToContainer:(NemoContainer *)destContainer;
 
 @end
